@@ -79,58 +79,60 @@
 </head>
 <body class="text-gray-800">
 
+    <!-- 調整 padding 適用小螢幕 -->
     <div class="container mx-auto p-4 md:p-8 relative z-10">
-        <!-- 標題區塊改成卡片式設計 - 強化 -->
-        <header class="text-center mb-10 p-6 md:p-8 bg-white rounded-2xl shadow-xl border-b-4 border-blue-400">
-            <h1 class="text-4xl md:text-5xl font-bold text-indigo-800">動詞三態互動學習網</h1>
-            <p class="mt-3 text-lg text-gray-700">點擊單字旁的喇叭圖示聽發音，並在下方進行隨機測驗！</p>
+        <!-- 調整 padding 和標題字級 -->
+        <header class="text-center mb-8 p-4 sm:p-6 md:p-8 bg-white rounded-2xl shadow-xl border-b-4 border-blue-400">
+            <h1 class="text-3xl sm:text-4xl md:text-5xl font-bold text-indigo-800">動詞三態互動學習網</h1>
+            <p class="mt-3 text-base sm:text-lg text-gray-700">點擊單字旁的喇叭圖示聽發音，並在下方進行隨機測驗！</p>
         </header>
 
         <main id="verb-tables" class="space-y-12">
             <!-- 動詞表格將會由 JavaScript 動態生成於此 -->
         </main>
 
-        <!-- 測驗區塊加大陰影 -->
-        <section id="quiz-section" class="mt-16 p-6 md:p-8 bg-white rounded-2xl shadow-2xl">
-            <h2 class="text-3xl font-bold text-center mb-6 text-gray-900">隨機測驗</h2>
+        <!-- 調整 padding 和標題字級 -->
+        <section id="quiz-section" class="mt-16 p-4 sm:p-6 md:p-8 bg-white rounded-2xl shadow-2xl">
+            <h2 class="text-2xl sm:text-3xl font-bold text-center mb-6 text-gray-900">隨機測驗</h2>
             
-            <!-- Gamification Scoreboard - 樣式大幅更新 -->
-            <div class="flex justify-center items-center gap-6 md:gap-10 mb-10 text-center">
+            <!-- 調整 gap, margin, padding 和字級 -->
+            <div class="flex justify-center items-center gap-4 sm:gap-6 md:gap-10 mb-8 text-center">
                 <!-- 分數卡片 -->
-                <div class="bg-gradient-to-br from-blue-400 to-blue-600 shadow-lg rounded-2xl p-6 min-w-[140px] text-white">
-                    <p class="text-lg font-medium text-blue-100">分數</p>
-                    <p id="score" class="text-5xl font-bold transition-transform duration-200">0</p>
+                <div class="bg-gradient-to-br from-blue-400 to-blue-600 shadow-lg rounded-2xl p-4 sm:p-6 min-w-[120px] sm:min-w-[140px] text-white">
+                    <p class="text-base sm:text-lg font-medium text-blue-100">分數</p>
+                    <p id="score" class="text-4xl sm:text-5xl font-bold transition-transform duration-200">0</p>
                 </div>
                 <!-- 連續答對卡片 -->
-                <div class="bg-gradient-to-br from-green-400 to-green-600 shadow-lg rounded-2xl p-6 min-w-[140px] text-white">
-                    <p class="text-lg font-medium text-green-100">連續答對</p>
-                    <p id="streak" class="text-5xl font-bold transition-transform duration-200">0</p>
+                <div class="bg-gradient-to-br from-green-400 to-green-600 shadow-lg rounded-2xl p-4 sm:p-6 min-w-[120px] sm:min-w-[140px] text-white">
+                    <p class="text-base sm:text-lg font-medium text-green-100">連續答對</p>
+                    <p id="streak" class="text-5xl sm:text-5xl font-bold transition-transform duration-200">0</p>
                 </div>
             </div>
 
             <div class="max-w-3xl mx-auto text-center">
-                <!-- Category Selector - 樣式更新 -->
-                <div class="mb-8 p-6 bg-white rounded-lg border shadow-inner">
-                    <h3 class="text-xl font-semibold text-center mb-4 text-gray-800">測驗範圍設定</h3>
-                    <div id="category-selector" class="flex flex-wrap justify-center gap-x-6 gap-y-3">
+                <!-- 調整 padding, gap 和字級 -->
+                <div class="mb-8 p-4 sm:p-6 bg-white rounded-lg border shadow-inner">
+                    <h3 class="text-lg sm:text-xl font-semibold text-center mb-4 text-gray-800">測驗範圍設定</h3>
+                    <div id="category-selector" class="flex flex-wrap justify-center gap-x-4 gap-y-2 sm:gap-x-6 sm:gap-y-3">
                         <!-- Checkboxes will be generated here by JS -->
                     </div>
                 </div>
 
-                <!-- Question Container - 樣式更新 -->
-                <div id="question-container" class="mb-6 p-6 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg min-h-[100px] flex items-center justify-center shadow-xl">
-                    <p id="question-text" class="text-xl md:text-2xl font-semibold">點擊「下一題」開始測驗！</p>
+                <!-- 調整 padding 和字級 -->
+                <div id="question-container" class="mb-6 p-4 sm:p-6 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg min-h-[100px] flex items-center justify-center shadow-xl">
+                    <p id="question-text" class="text-lg sm:text-xl md:text-2xl font-semibold">點擊「下一題」開始測驗！</p>
                 </div>
 
                 <div class="flex flex-col sm:flex-row gap-4 justify-center">
-                    <!-- Input - 樣式更新 -->
-                    <input type="text" id="answer-input" placeholder="在這裡輸入答案" class="w-full sm:w-1/2 px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out text-lg focus:shadow-lg">
+                    <!-- 調整字級 -->
+                    <input type="text" id="answer-input" placeholder="在這裡輸入答案" class="w-full sm:w-1/2 px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out text-base sm:text-lg focus:shadow-lg">
                     <!-- Button - 樣式更新 -->
                     <button id="submit-btn" class="px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition transform hover:-translate-y-0.5 hover:bg-blue-700 hover:scale-105">送出答案</button>
                 </div>
                 <!-- Button - 樣式更新 -->
                  <button id="next-question-btn" class="mt-4 px-8 py-3 bg-green-600 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition transform hover:-translate-y-0.5 hover:bg-green-700 hover:scale-105">下一題</button>
-                <div id="feedback-container" class="mt-4 text-xl font-bold min-h-[30px]">
+                <!-- 調整字級 -->
+                <div id="feedback-container" class="mt-4 text-lg sm:text-xl font-bold min-h-[30px]">
                     <!-- 回饋訊息將顯示於此 -->
                 </div>
             </div>
@@ -384,7 +386,8 @@
         // 創建單一單字播放按鈕的儲存格
         function createTableCell(text) {
             const cell = document.createElement('td');
-            cell.className = 'px-4 py-3 text-center text-md md:text-lg';
+            // 調整字級
+            cell.className = 'px-4 py-3 text-center text-sm sm:text-base md:text-lg';
             const contentDiv = document.createElement('div');
             contentDiv.className = 'table-cell-content';
             contentDiv.appendChild(document.createTextNode(text));
@@ -414,12 +417,13 @@
         function renderTables() {
             verbData.forEach(group => {
                 const section = document.createElement('section');
-                // 表格區塊加大陰影
-                section.className = 'p-6 md:p-8 bg-white rounded-2xl shadow-2xl';
+                // 調整 padding
+                section.className = 'p-4 sm:p-6 md:p-8 bg-white rounded-2xl shadow-2xl';
                 const header = document.createElement('div');
                 header.className = 'mb-4';
                 const title = document.createElement('h2');
-                title.className = 'text-2xl md:text-3xl font-bold text-gray-900';
+                // 調整字級
+                title.className = 'text-xl sm:text-2xl md:text-3xl font-bold text-gray-900';
                 title.textContent = group.title;
                 header.appendChild(title);
                 section.appendChild(header);
@@ -470,7 +474,8 @@
                 const label = document.createElement('label');
                 label.htmlFor = `category-${index}`;
                 label.textContent = group.title.split(' ')[1]; // e.g., "規則動詞"
-                label.className = 'ml-2 text-md text-gray-700 cursor-pointer select-none';
+                // 調整字級
+                label.className = 'ml-2 text-sm sm:text-md text-gray-700 cursor-pointer select-none';
                 container.appendChild(input);
                 container.appendChild(label);
                 categorySelectorEl.appendChild(container);
@@ -530,19 +535,22 @@
 
             if (userAnswer === '') {
                 feedbackContainer.textContent = '請輸入答案！';
-                feedbackContainer.className = 'mt-4 text-xl font-bold text-yellow-500 min-h-[30px]';
+                // 調整字級
+                feedbackContainer.className = 'mt-4 text-lg sm:text-xl font-bold text-yellow-500 min-h-[30px]';
                 return;
             }
 
             if (userAnswer === correctAnswer) {
                 feedbackContainer.textContent = `答對了！答案是 ${currentQuestion.answer}`;
-                feedbackContainer.className = 'mt-4 text-xl font-bold text-green-500 min-h-[30px]';
+                // 調整字級
+                feedbackContainer.className = 'mt-4 text-lg sm:text-xl font-bold text-green-500 min-h-[30px]';
                 score++;
                 streak++;
                 speak('Correct');
             } else {
                 feedbackContainer.textContent = `答錯了，正確答案是 ${currentQuestion.answer}`;
-                feedbackContainer.className = 'mt-4 text-xl font-bold text-red-500 min-h-[30px]';
+                // 調整字級
+                feedbackContainer.className = 'mt-4 text-lg sm:text-xl font-bold text-red-500 min-h-[30px]';
                 streak = 0;
                 speak('Incorrect');
             }
