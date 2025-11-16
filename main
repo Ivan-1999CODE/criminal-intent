@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>動詞三態互動學習網</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', 'Noto Sans TC', sans-serif;
+        }
+        .table-cell-content {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .speaker-icon {
+            cursor: pointer;
+            color: #4B5563; /* gray-600 */
+            transition: color 0.2s ease-in-out;
+        }
+        .speaker-icon:hover {
+            color: #1D4ED8; /* blue-700 */
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800">
+
+    <div class="container mx-auto p-4 md:p-8">
+        <header class="text-center mb-10">
+            <h1 class="text-4xl md:text-5xl font-bold text-gray-900">動詞三態互動學習網</h1>
+            <p class="mt-2 text-lg text-gray-600">點擊單字旁的喇叭圖示聽發音，並在下方進行隨機測驗！</p>
+        </header>
+
+        <main id="verb-tables" class="space-y-12">
+            <!-- 動詞表格將會由 JavaScript 動態生成於此 -->
+        </main>
+
+        <section id="quiz-section" class="mt-16 p-6 md:p-8 bg-white rounded-2xl shadow-lg">
+            <h2 class="text-3xl font-bold text-center mb-2 text-gray-900">隨機測驗</h2>
+            
+            <!-- Gamification Scoreboard -->
+            <div class="flex justify-center items-center gap-8 mb-6 text-center">
+                <div>
+                    <p class="text-lg font-medium text-gray-600">分數</p>
+                    <p id="score" class="text-3xl font-bold text-blue-600 transition-transform duration-200">0</p>
+                </div>
+                <div>
+                    <p class="text-lg font-medium text-gray-600">連續答對</p>
+                    <p id="streak" class="text-3xl font-bold text-green-600 transition-transform duration-200">0</p>
+                </div>
+            </div>
+
+            <div class="max-w-3xl mx-auto text-center">
+                <!-- Category Selector -->
+                <div class="mb-8 p-4 bg-gray-50 rounded-lg border">
+                    <h3 class="text-xl font-semibold text-center mb-4 text-gray-800">測驗範圍設定</h3>
+                    <div id="category-selector" class="flex flex-wrap justify-center gap-x-6 gap-y-3">
+                        <!-- Checkboxes will be generated here by JS -->
+                    </div>
+                </div>
+
+                <div id="question-container" class="mb-4 p-6 bg-blue-50 border-2 border-blue-200 rounded-lg min-h-[100px] flex items-center justify-center">
+                    <p id="question-text" class="text-xl md:text-2xl font-semibold text-blue-800">點擊「下一題」開始測驗！</p>
+                </div>
+                <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                    <input type="text" id="answer-input" placeholder="在這裡輸入答案" class="w-full sm:w-1/2 px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out text-lg">
+                    <button id="submit-btn" class="px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition transform hover:scale-105">送出答案</button>
+                </div>
+                 <button id="next-question-btn" class="mt-4 px-8 py-3 bg-green-600 text-white font-semibold rounded-lg shadow-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition transform hover:scale-105">下一題</button>
+                <div id="feedback-container" class="mt-4 text-xl font-bold min-h-[30px]">
+                    <!-- 回饋訊息將顯示於此 -->
+                </div>
+            </div>
+        </section>
+
+    </div>
+
+    <script>
+        const verbData = [
+            {
+                title: "1. 規則動詞 (Regular Verbs)",
+                verbs: [
+                    { infinitive: 'ask', pastSimple: 'asked', pastParticiple: 'asked', translation: '問' },
+                    { infinitive: 'learn', pastSimple: 'learned', pastParticiple: 'learned', translation: '學習' },
+                    { infinitive: 'start', pastSimple: 'started', pastParticiple: 'started', translation: '開始' },
+                    { infinitive: 'play', pastSimple: 'played', pastParticiple: 'played', translation: '玩' },
+                    { infinitive: 'die', pastSimple: 'died', pastParticiple: 'died', translation: '死亡' },
+                    { infinitive: 'close', pastSimple: 'closed', pastParticiple: 'closed', translation: '關閉' },
+                    { infinitive: 'like', pastSimple: 'liked', pastParticiple: 'liked', translation: '喜歡' },
+                    { infinitive: 'hope', pastSimple: 'hoped', pastParticiple: 'hoped', translation: '希望' }
+                ]
+            },
+            {
+                title: "2. A-A-A 型 (三態同形)",
+                verbs: [
+                    { infinitive: 'cost', pastSimple: 'cost', pastParticiple: 'cost', translation: '花費' },
+                    { infinitive: 'cut', pastSimple: 'cut', pastParticiple: 'cut', translation: '割' },
+                    { infinitive: 'hit', pastSimple: 'hit', pastParticiple: 'hit', translation: '打' },
+                    { infinitive: 'let', pastSimple: 'let', pastParticiple: 'let', translation: '允許' },
+                    { infinitive: 'put', pastSimple: 'put', pastParticiple: 'put', translation: '放置' },
+                    { infinitive: 'read', pastSimple: 'read', pastParticiple: 'read', translation: '閱讀' },
+                    { infinitive: 'set', pastSimple: 'set', pastParticiple: 'set', translation: '設置' },
+                    { infinitive: 'spread', pastSimple: 'spread', pastParticiple: 'spread', translation: '展開' },
+                    { infinitive: 'fit', pastSimple: 'fit', pastParticiple: 'fit', translation: '合身' },
+                    { infinitive: 'hurt', pastSimple: 'hurt', pastParticiple: 'hurt', translation: '傷害' },
+                    { infinitive: 'quit', pastSimple: 'quit', pastParticiple: 'quit', translation: '放棄' },
+                    { infinitive: 'shut', pastSimple: 'shut', pastParticiple: 'shut', translation: '關閉' }
+                ]
+            },
+            {
+                title: "3. A-B-B 型 (過去式與過去分詞同形)",
+                verbs: [
+                    { infinitive: 'buy', pastSimple: 'bought', pastParticiple: 'bought', translation: '購買' },
+                    { infinitive: 'sell', pastSimple: 'sold', pastParticiple: 'sold', translation: '販賣' },
+                    { infinitive: 'hold', pastSimple: 'held', pastParticiple: 'held', translation: '握住、舉辦' },
+                    { infinitive: 'tell', pastSimple: 'told', pastParticiple: 'told', translation: '告訴' },
+                    { infinitive: 'think', pastSimple: 'thought', pastParticiple: 'thought', translation: '思考' },
+                    { infinitive: 'bring', pastSimple: 'brought', pastParticiple: 'brought', translation: '帶來' },
+                    { infinitive: 'meet', pastSimple: 'met', pastParticiple: 'met', translation: '遇見' },
+                    { infinitive: 'keep', pastSimple: 'kept', pastParticiple: 'kept', translation: '保持' },
+                    { infinitive: 'sleep', pastSimple: 'slept', pastParticiple: 'slept', translation: '睡覺' },
+                    { infinitive: 'find', pastSimple: 'found', pastParticiple: 'found', translation: '發現' },
+                    { infinitive: 'seek', pastSimple: 'sought', pastParticiple: 'sought', translation: '尋找' },
+                    { infinitive: 'teach', pastSimple: 'taught', pastParticiple: 'taught', translation: '教' },
+                    { infinitive: 'spend', pastSimple: 'spent', pastParticiple: 'spent', translation: '花費' },
+                    { infinitive: 'send', pastSimple: 'sent', pastParticiple: 'sent', translation: '寄送' },
+                    { infinitive: 'stand', pastSimple: 'stood', pastParticiple: 'stood', translation: '站立' },
+                    { infinitive: 'feel', pastSimple: 'felt', pastParticiple: 'felt', translation: '感覺' },
+                    { infinitive: 'catch', pastSimple: 'caught', pastParticiple: 'caught', translation: '捕抓' },
+                    { infinitive: 'hear', pastSimple: 'heard', pastParticiple: 'heard', translation: '聽見' },
+                    { infinitive: 'build', pastSimple: 'built', pastParticiple: 'built', translation: '興建' },
+                    { infinitive: 'bend', pastSimple: 'bent', pastParticiple: 'bent', translation: '彎曲' },
+                    { infinitive: 'burn', pastSimple: 'burnt', pastParticiple: 'burnt', translation: '燃燒;燒焦' },
+                    { infinitive: 'deal', pastSimple: 'dealt', pastParticiple: 'dealt', translation: '處理' },
+                    { infinitive: 'dig', pastSimple: 'dug', pastParticiple: 'dug', translation: '挖' },
+                    { infinitive: 'dive', pastSimple: 'dove', pastParticiple: 'dove', translation: '潛水' },
+                    { infinitive: 'feed', pastSimple: 'fed', pastParticiple: 'fed', translation: '餵' },
+                    { infinitive: 'fight', pastSimple: 'fought', pastParticiple: 'fought', translation: '打仗;打架' },
+                    { infinitive: 'get', pastSimple: 'got', pastParticiple: 'got', translation: '得到' },
+                    { infinitive: 'hang', pastSimple: 'hung', pastParticiple: 'hung', translation: '懸掛' },
+                    { infinitive: 'hang', pastSimple: 'hanged', pastParticiple: 'hanged', translation: '吊死' },
+                    { infinitive: 'have', pastSimple: 'had', pastParticiple: 'had', translation: '有;吃' },
+                    { infinitive: 'lead', pastSimple: 'led', pastParticiple: 'led', translation: '帶領;領導' },
+                    { infinitive: 'leave', pastSimple: 'left', pastParticiple: 'left', translation: '留下;離開' },
+                    { infinitive: 'lend', pastSimple: 'lent', pastParticiple: 'lent', translation: '借出' },
+                    { infinitive: 'light', pastSimple: 'lit', pastParticiple: 'lit', translation: '點燃' },
+                    { infinitive: 'lose', pastSimple: 'lost', pastParticiple: 'lost', translation: '輸;失去;迷路' },
+                    { infinitive: 'make', pastSimple: 'made', pastParticiple: 'made', translation: '製造;做' },
+                    { infinitive: 'mean', pastSimple: 'meant', pastParticiple: 'meant', translation: '意指' },
+                    { infinitive: 'pay', pastSimple: 'paid', pastParticiple: 'paid', translation: '付費' },
+                    { infinitive: 'say', pastSimple: 'said', pastParticiple: 'said', translation: '說' },
+                    { infinitive: 'shine', pastSimple: 'shone', pastParticiple: 'shone', translation: '照耀;閃光' },
+                    { infinitive: 'shoot', pastSimple: 'shot', pastParticiple: 'shot', translation: '投射;開槍' },
+                    { infinitive: 'sit', pastSimple: 'sat', pastParticiple: 'sat', translation: '坐' },
+                    { infinitive: 'smell', pastSimple: 'smelt', pastParticiple: 'smelt', translation: '聞' },
+                    { infinitive: 'spell', pastSimple: 'spelt', pastParticiple: 'spelt', translation: '拼字' },
+                    { infinitive: 'stick', pastSimple: 'stuck', pastParticiple: 'stuck', translation: '黏' },
+                    { infinitive: 'sweep', pastSimple: 'swept', pastParticiple: 'swept', translation: '清掃' },
+                    { infinitive: 'understand', pastSimple: 'understood', pastParticiple: 'understood', translation: '了解' },
+                    { infinitive: 'win', pastSimple: 'won', pastParticiple: 'won', translation: '贏' }
+                ]
+            },
+            {
+                title: "4. A-B-C 型 (三態皆不同形)",
+                verbs: [
+                    { infinitive: 'ride', pastSimple: 'rode', pastParticiple: 'ridden', translation: '騎' },
+                    { infinitive: 'drive', pastSimple: 'drove', pastParticiple: 'driven', translation: '開車' },
+                    { infinitive: 'shake', pastSimple: 'shook', pastParticiple: 'shaken', translation: '震動' },
+                    { infinitive: 'choose', pastSimple: 'chose', pastParticiple: 'chosen', translation: '選擇' },
+                    { infinitive: 'break', pastSimple: 'broke', pastParticiple: 'broken', translation: '打破' },
+                    { infinitive: 'speak', pastSimple: 'spoke', pastParticiple: 'spoken', translation: '說話' },
+                    { infinitive: 'write', pastSimple: 'wrote', pastParticiple: 'written', translation: '寫' },
+                    { infinitive: 'eat', pastSimple: 'ate', pastParticiple: 'eaten', translation: '吃' },
+                    { infinitive: 'fall', pastSimple: 'fell', pastParticiple: 'fallen', translation: '落下' },
+                    { infinitive: 'forget', pastSimple: 'forgot', pastParticiple: 'forgotten', translation: '忘記' },
+                    { infinitive: 'begin', pastSimple: 'began', pastParticiple: 'begun', translation: '開始' },
+                    { infinitive: 'drink', pastSimple: 'drank', pastParticiple: 'drunk', translation: '喝' },
+                    { infinitive: 'know', pastSimple: 'knew', pastParticiple: 'known', translation: '知道' },
+                    { infinitive: 'fly', pastSimple: 'flew', pastParticiple: 'flown', translation: '飛' },
+                    { infinitive: 'go', pastSimple: 'went', pastParticiple: 'gone', translation: '去' },
+                    { infinitive: 'see', pastSimple: 'saw', pastParticiple: 'seen', translation: '看見' },
+                    { infinitive: 'grow', pastSimple: 'grew', pastParticiple: 'grown', translation: '生長' },
+                    { infinitive: 'swim', pastSimple: 'swam', pastParticiple: 'swum', translation: '游泳' },
+                    { infinitive: 'do', pastSimple: 'did', pastParticiple: 'done', translation: '做' },
+                    { infinitive: 'be', pastSimple: 'was/were', pastParticiple: 'been', translation: '(be動詞)是' },
+                    { infinitive: 'bear', pastSimple: 'bore', pastParticiple: 'born', translation: '生' },
+                    { infinitive: 'beat', pastSimple: 'beat', pastParticiple: 'beaten', translation: '打;打敗' },
+                    { infinitive: 'bite', pastSimple: 'bit', pastParticiple: 'bitten', translation: '咬' },
+                    { infinitive: 'blow', pastSimple: 'blew', pastParticiple: 'blown', translation: '吹' },
+                    { infinitive: 'draw', pastSimple: 'drew', pastParticiple: 'drawn', translation: '畫;繪製' },
+                    { infinitive: 'forgive', pastSimple: 'forgave', pastParticiple: 'forgiven', translation: '原諒' },
+                    { infinitive: 'freeze', pastSimple: 'froze', pastParticiple: 'frozen', translation: '凝固;結冰' },
+                    { infinitive: 'get', pastSimple: 'got', pastParticiple: 'got/gotten', translation: '獲得' },
+                    { infinitive: 'give', pastSimple: 'gave', pastParticiple: 'given', translation: '給' },
+                    { infinitive: 'hide', pastSimple: 'hid', pastParticiple: 'hidden', translation: '躲藏' },
+                    { infinitive: 'lie', pastSimple: 'lay', pastParticiple: 'lain', translation: '躺著' },
+                    { infinitive: 'ring', pastSimple: 'rang', pastParticiple: 'rung', translation: '鈴響' },
+                    { infinitive: 'rise', pastSimple: 'rose', pastParticiple: 'risen', translation: '起立' },
+                    { infinitive: 'show', pastSimple: 'showed', pastParticiple: 'shown', translation: '展示' },
+                    { infinitive: 'sing', pastSimple: 'sang', pastParticiple: 'sung', translation: '唱歌' },
+                    { infinitive: 'steal', pastSimple: 'stole', pastParticiple: 'stolen', translation: '偷' },
+                    { infinitive: 'take', pastSimple: 'took', pastParticiple: 'taken', translation: '帶(往)' },
+                    { infinitive: 'throw', pastSimple: 'threw', pastParticiple: 'thrown', translation: '投擲' },
+                    { infinitive: 'wake', pastSimple: 'woke', pastParticiple: 'woken', translation: '醒來' },
+                    { infinitive: 'wear', pastSimple: 'wore', pastParticiple: 'worn', translation: '穿戴' },
+                    { infinitive: 'write', pastSimple: 'wrote', pastParticiple: 'written', translation: '寫' }
+                ]
+            },
+            {
+                title: "5. A-B-A 型 (原形與過去分詞同形)",
+                verbs: [
+                    { infinitive: 'run', pastSimple: 'ran', pastParticiple: 'run', translation: '跑' },
+                    { infinitive: 'come', pastSimple: 'came', pastParticiple: 'come', translation: '來' },
+                    { infinitive: 'become', pastSimple: 'became', pastParticiple: 'become', translation: '變成' },
+                    { infinitive: 'overcome', pastSimple: 'overcame', pastParticiple: 'overcome', translation: '克服' }
+                ]
+            }
+        ];
+
+        let currentQuestion = null;
+        let score = 0;
+        let streak = 0;
+        
+        // DOM Elements
+        const verbTablesContainer = document.getElementById('verb-tables');
+        const questionText = document.getElementById('question-text');
+        const answerInput = document.getElementById('answer-input');
+        const submitBtn = document.getElementById('submit-btn');
+        const nextQuestionBtn = document.getElementById('next-question-btn');
+        const feedbackContainer = document.getElementById('feedback-container');
+        const scoreEl = document.getElementById('score');
+        const streakEl = document.getElementById('streak');
+        const categorySelectorEl = document.getElementById('category-selector');
+
+        // --- Functions ---
+
+        // 升級後的語音功能，可以處理單一或連續播放
+        function speak(texts) {
+            if (!('speechSynthesis' in window)) {
+                console.error("Sorry, your browser doesn't support text-to-speech.");
+                return;
+            }
+            
+            const wordsToSpeak = Array.isArray(texts) ? texts : [texts];
+            if (wordsToSpeak.length === 0) return;
+
+            speechSynthesis.cancel(); 
+
+            let currentIndex = 0;
+
+            function speakNext() {
+                if (currentIndex < wordsToSpeak.length) {
+                    const utterance = new SpeechSynthesisUtterance(wordsToSpeak[currentIndex]);
+                    utterance.lang = 'en-US';
+                    utterance.onend = () => {
+                        currentIndex++;
+                        speakNext();
+                    };
+                    speechSynthesis.speak(utterance);
+                }
+            }
+            speakNext();
+        }
+
+        function createSpeakerIcon() {
+            const icon = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+            icon.setAttribute("class", "speaker-icon h-6 w-6");
+            icon.setAttribute("fill", "none");
+            icon.setAttribute("viewBox", "0 0 24 24");
+            icon.setAttribute("stroke", "currentColor");
+            icon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />`;
+            return icon;
+        }
+
+        // 創建單一單字播放按鈕的儲存格
+        function createTableCell(text) {
+            const cell = document.createElement('td');
+            cell.className = 'px-4 py-3 text-center text-md md:text-lg';
+            const contentDiv = document.createElement('div');
+            contentDiv.className = 'table-cell-content';
+            contentDiv.appendChild(document.createTextNode(text));
+            if (/^[a-zA-Z]+$/.test(text)) {
+                 const speakerIcon = createSpeakerIcon();
+                speakerIcon.addEventListener('click', () => speak(text));
+                contentDiv.appendChild(speakerIcon);
+            }
+            cell.appendChild(contentDiv);
+            return cell;
+        }
+        
+        // 新增：創建連續播放按鈕的儲存格
+        function createPlayAllCell(verb) {
+            const cell = document.createElement('td');
+            cell.className = 'px-2 py-3 text-center';
+            const speakerIcon = createSpeakerIcon();
+            speakerIcon.addEventListener('click', () => {
+                speak([verb.infinitive, verb.pastSimple, verb.pastParticiple]);
+            });
+            cell.appendChild(speakerIcon);
+            return cell;
+        }
+
+        function renderTables() {
+            verbData.forEach(group => {
+                const section = document.createElement('section');
+                section.className = 'p-6 md:p-8 bg-white rounded-2xl shadow-lg';
+                const header = document.createElement('div');
+                header.className = 'mb-4';
+                const title = document.createElement('h2');
+                title.className = 'text-2xl md:text-3xl font-bold text-gray-900';
+                title.textContent = group.title;
+                header.appendChild(title);
+                section.appendChild(header);
+                const tableContainer = document.createElement('div');
+                tableContainer.className = 'overflow-x-auto';
+                const table = document.createElement('table');
+                table.className = 'min-w-full divide-y-2 divide-gray-200';
+
+                const thead = document.createElement('thead');
+                thead.className = 'bg-gray-50';
+                thead.innerHTML = `<tr>
+                        <th class="px-2 py-3 text-center text-sm font-semibold text-gray-600 uppercase tracking-wider">播放</th>
+                        <th class="px-4 py-3 text-center text-sm font-semibold text-gray-600 uppercase tracking-wider">原形動詞</th>
+                        <th class="px-4 py-3 text-center text-sm font-semibold text-gray-600 uppercase tracking-wider">過去簡單式</th>
+                        <th class="px-4 py-3 text-center text-sm font-semibold text-gray-600 uppercase tracking-wider">過去分詞</th>
+                        <th class="px-4 py-3 text-center text-sm font-semibold text-gray-600 uppercase tracking-wider">中文翻譯</th></tr>`;
+                table.appendChild(thead);
+
+                const tbody = document.createElement('tbody');
+                tbody.className = 'bg-white divide-y divide-gray-200';
+                group.verbs.forEach(verb => {
+                    const row = document.createElement('tr');
+                    row.appendChild(createPlayAllCell(verb)); // 新增的儲存格
+                    row.appendChild(createTableCell(verb.infinitive));
+                    row.appendChild(createTableCell(verb.pastSimple));
+                    row.appendChild(createTableCell(verb.pastParticiple));
+                    row.appendChild(createTableCell(verb.translation));
+                    tbody.appendChild(row);
+                });
+                table.appendChild(tbody);
+                tableContainer.appendChild(table);
+                section.appendChild(tableContainer);
+                verbTablesContainer.appendChild(section);
+            });
+        }
+        
+        function renderCategorySelector() {
+            verbData.forEach((group, index) => {
+                const container = document.createElement('div');
+                container.className = 'flex items-center';
+                const input = document.createElement('input');
+                input.type = 'checkbox';
+                input.id = `category-${index}`;
+                input.value = index;
+                input.checked = true;
+                input.className = 'h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer';
+                const label = document.createElement('label');
+                label.htmlFor = `category-${index}`;
+                label.textContent = group.title.split(' ')[1]; // e.g., "規則動詞"
+                label.className = 'ml-2 text-md text-gray-700 cursor-pointer select-none';
+                container.appendChild(input);
+                container.appendChild(label);
+                categorySelectorEl.appendChild(container);
+            });
+        }
+        
+        function updateScoreboard() {
+            scoreEl.textContent = score;
+            streakEl.textContent = streak;
+            scoreEl.classList.add('scale-125');
+            streakEl.classList.add('scale-125');
+            setTimeout(() => {
+                scoreEl.classList.remove('scale-125');
+                streakEl.classList.remove('scale-125');
+            }, 200);
+        }
+
+        function generateQuestion() {
+            const selectedCategories = Array.from(document.querySelectorAll('#category-selector input:checked')).map(input => parseInt(input.value));
+            const quizPool = verbData
+                .filter((group, index) => selectedCategories.includes(index))
+                .flatMap(group => group.verbs);
+
+            if (quizPool.length === 0) {
+                questionText.innerHTML = `<span class="text-yellow-700 font-semibold">請至少選擇一個測驗範圍！</span>`;
+                currentQuestion = null;
+                return;
+            }
+
+            const randomVerb = quizPool[Math.floor(Math.random() * quizPool.length)];
+            const questionType = Math.random() < 0.5 ? 'pastSimple' : 'pastParticiple';
+            const typeText = questionType === 'pastSimple' ? '過去簡單式' : '過去分詞';
+            
+            currentQuestion = {
+                verb: randomVerb,
+                type: questionType,
+                answer: randomVerb[questionType]
+            };
+
+            questionText.innerHTML = `「<strong class="text-red-600">${randomVerb.infinitive}</strong>」的${typeText}是什麼？`;
+            speak(randomVerb.infinitive);
+            
+            answerInput.value = '';
+            answerInput.disabled = false;
+            submitBtn.disabled = false;
+            feedbackContainer.textContent = '';
+            answerInput.focus();
+        }
+
+        function checkAnswer() {
+            if (!currentQuestion) return;
+
+            const userAnswer = answerInput.value.trim().toLowerCase();
+            const correctAnswer = currentQuestion.answer.toLowerCase();
+
+            if (userAnswer === '') {
+                feedbackContainer.textContent = '請輸入答案！';
+                feedbackContainer.className = 'mt-4 text-xl font-bold text-yellow-600 min-h-[30px]';
+                return;
+            }
+
+            if (userAnswer === correctAnswer) {
+                feedbackContainer.textContent = `答對了！答案是 ${currentQuestion.answer}`;
+                feedbackContainer.className = 'mt-4 text-xl font-bold text-green-600 min-h-[30px]';
+                score++;
+                streak++;
+                speak('Correct');
+            } else {
+                feedbackContainer.textContent = `答錯了，正確答案是 ${currentQuestion.answer}`;
+                feedbackContainer.className = 'mt-4 text-xl font-bold text-red-600 min-h-[30px]';
+                streak = 0;
+                speak('Incorrect');
+            }
+            
+            updateScoreboard();
+            answerInput.disabled = true;
+            submitBtn.disabled = true;
+        }
+
+        // --- Event Listeners & Initialization ---
+
+        nextQuestionBtn.addEventListener('click', generateQuestion);
+        submitBtn.addEventListener('click', checkAnswer);
+        answerInput.addEventListener('keypress', (event) => {
+            if (event.key === 'Enter') {
+                checkAnswer();
+            }
+        });
+
+        // Initial setup
+        renderTables();
+        renderCategorySelector();
+        updateScoreboard();
+    </script>
+
+</body>
+</html>
