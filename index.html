@@ -5,145 +5,253 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>動詞三態互動學習網</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Noto Sans TC"', 'sans-serif'],
+                        display: ['"Fredoka"', 'cursive'],
+                    },
+                    colors: {
+                        'brand-blue': '#4facfe',
+                        'brand-purple': '#00f2fe',
+                        'game-bg': '#f3f4f6',
+                    },
+                    animation: {
+                        'glow-pulse': 'glowPulse 1.5s infinite',
+                    },
+                    keyframes: {
+                        glowPulse: {
+                            '0%, 100%': { boxShadow: '0 0 0 0 rgba(250, 204, 21, 0.7)' },
+                            '50%': { boxShadow: '0 0 0 10px rgba(250, 204, 21, 0)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
     <style>
         body {
-            font-family: 'Inter', 'Noto Sans TC', sans-serif;
-            /* 更新的背景漸層 */
-            background-color: #e0f7fa; /* Fallback */
-            background: linear-gradient(120deg, #e0f7fa 0%, #d1c4e9 100%);
-            overflow-x: hidden; /* 隱藏水平滾動條 */
-        }
-        
-        /* 動態光暈背景效果 */
-        body::before, body::after {
-            content: '';
-            position: fixed;
-            z-index: -10;
-            border-radius: 50%;
-            opacity: 0.2;
-            filter: blur(100px);
-            /* 動畫速度加快，範圍加大 */
-            animation: moveGlow 12s infinite alternate;
+            background: linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
         }
 
-        body::before {
-            background: #81d4fa; /* light blue */
-            width: 400px;
-            height: 400px;
-            top: -150px;
-            left: -150px;
+        .btn-3d {
+            transition: all 0.1s;
+            transform: translateY(0);
+            border-bottom-width: 4px;
+        }
+        .btn-3d:active {
+            transform: translateY(2px);
+            border-bottom-width: 2px;
+            margin-top: 2px;
         }
 
-        body::after {
-            background: #ce93d8; /* light purple */
-            width: 500px;
-            height: 500px;
-            bottom: -200px;
-            right: -200px;
-            /* 錯開動畫時間 */
-            animation-delay: -6s;
+        .blob {
+            position: absolute;
+            filter: blur(80px);
+            z-index: -1;
+            animation: float 10s infinite ease-in-out alternate;
+        }
+        .blob-1 { top: -10%; left: -10%; width: 500px; height: 500px; background: rgba(255, 154, 158, 0.4); animation-delay: 0s; }
+        .blob-2 { bottom: -10%; right: -10%; width: 400px; height: 400px; background: rgba(161, 140, 209, 0.4); animation-delay: -5s; }
+        .blob-3 { top: 40%; left: 40%; width: 300px; height: 300px; background: rgba(251, 194, 235, 0.3); animation-delay: -2s; }
+
+        @keyframes float {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(30px, 50px) scale(1.1); }
         }
 
-        @keyframes moveGlow {
-            0% {
-                transform: translate(0, 0) scale(1);
-            }
-            100% {
-                /* 增大移動和縮放範圍 */
-                transform: translate(150px, 80px) scale(1.4);
-            }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
         }
 
-        .table-cell-content {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
+        .table-row-hover:hover {
+            background-color: #f0f9ff;
+            transform: scale(1.01);
+            transition: all 0.2s;
         }
+
         .speaker-icon {
             cursor: pointer;
-            color: #4B5563; /* gray-600 */
-            /* 加上 transform 動畫 */
-            transition: color 0.2s ease-in-out, transform 0.1s ease-in-out;
+            color: #6366f1;
+            transition: all 0.2s;
         }
         .speaker-icon:hover {
-            color: #1D4ED8; /* blue-700 */
+            color: #4338ca;
+            transform: scale(1.2);
         }
-        /* 按鈕點擊時的 active 狀態 */
         .speaker-icon.active {
-            color: #0c4a6e; /* 換成更深的顏色 */
-            transform: scale(1.25);
+            color: #ec4899;
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+        }
+
+        .hidden-section { display: none !important; }
+
+        .bounce-in { animation: bounceIn 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55); }
+        @keyframes bounceIn {
+            0% { opacity: 0; transform: scale(0.3); }
+            50% { opacity: 1; transform: scale(1.05); }
+            70% { transform: scale(0.9); }
+            100% { transform: scale(1); }
+        }
+        
+        .fade-in-up { animation: fadeInUp 0.5s ease-out; }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
     </style>
 </head>
-<body class="text-gray-800">
+<body class="text-slate-700 antialiased selection:bg-purple-200 selection:text-purple-900">
 
-    <!-- 調整 padding 適用小螢幕 -->
-    <div class="container mx-auto p-4 md:p-8 relative z-10">
-        <!-- 調整 padding 和標題字級 -->
-        <header class="text-center mb-8 p-4 sm:p-6 md:p-8 bg-white rounded-2xl shadow-xl border-b-4 border-blue-400">
-            <h1 class="text-3xl sm:text-4xl md:text-5xl font-bold text-indigo-800">動詞三態互動學習網</h1>
-            <p class="mt-3 text-base sm:text-lg text-gray-700">點擊單字旁的喇叭圖示聽發音，並在下方進行隨機測驗！</p>
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="blob blob-3"></div>
+
+    <div class="container mx-auto px-4 py-8 max-w-6xl relative z-10">
+        
+        <header class="text-center mb-10 fade-in-up">
+            <h1 class="text-4xl md:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600 tracking-tight font-display drop-shadow-sm mb-4">
+                動詞三態大挑戰
+            </h1>
+            <p class="text-lg md:text-xl text-slate-600 font-medium bg-white/60 inline-block px-6 py-2 rounded-full shadow-sm backdrop-blur-sm">
+                🎧 點擊喇叭聽發音 · 🚀 切換分頁來闖關
+            </p>
         </header>
 
-        <main id="verb-tables" class="space-y-12">
-            <!-- 動詞表格將會由 JavaScript 動態生成於此 -->
-        </main>
-
-        <!-- 調整 padding 和標題字級 -->
-        <section id="quiz-section" class="mt-16 p-4 sm:p-6 md:p-8 bg-white rounded-2xl shadow-2xl">
-            <h2 class="text-2xl sm:text-3xl font-bold text-center mb-6 text-gray-900">隨機測驗</h2>
-            
-            <!-- 調整 gap, margin, padding 和字級 -->
-            <div class="flex justify-center items-center gap-4 sm:gap-6 md:gap-10 mb-8 text-center">
-                <!-- 分數卡片 -->
-                <div class="bg-gradient-to-br from-blue-400 to-blue-600 shadow-lg rounded-2xl p-4 sm:p-6 min-w-[120px] sm:min-w-[140px] text-white">
-                    <p class="text-base sm:text-lg font-medium text-blue-100">分數</p>
-                    <p id="score" class="text-4xl sm:text-5xl font-bold transition-transform duration-200">0</p>
-                </div>
-                <!-- 連續答對卡片 -->
-                <div class="bg-gradient-to-br from-green-400 to-green-600 shadow-lg rounded-2xl p-4 sm:p-6 min-w-[120px] sm:min-w-[140px] text-white">
-                    <p class="text-base sm:text-lg font-medium text-green-100">連續答對</p>
-                    <p id="streak" class="text-5xl sm:text-5xl font-bold transition-transform duration-200">0</p>
-                </div>
+        <div class="flex justify-center mb-10 fade-in-up" style="animation-delay: 0.1s;">
+            <div class="bg-white/80 p-2 rounded-2xl shadow-lg backdrop-blur flex gap-2">
+                <button id="tab-study" class="px-8 py-3 rounded-xl font-bold text-lg transition-all duration-300 flex items-center gap-2 bg-gradient-to-r from-violet-500 to-fuchsia-500 text-white shadow-md transform scale-105">
+                    <span>📖</span> 單字表學習
+                </button>
+                <button id="tab-quiz" class="px-8 py-3 rounded-xl font-bold text-lg transition-all duration-300 flex items-center gap-2 text-slate-500 hover:bg-slate-100">
+                    <span>🎮</span> 隨機測驗
+                </button>
             </div>
+        </div>
 
-            <div class="max-w-3xl mx-auto text-center">
-                <!-- 調整 padding, gap 和字級 -->
-                <div class="mb-8 p-4 sm:p-6 bg-white rounded-lg border shadow-inner">
-                    <h3 class="text-lg sm:text-xl font-semibold text-center mb-4 text-gray-800">測驗範圍設定</h3>
-                    <div id="category-selector" class="flex flex-wrap justify-center gap-x-4 gap-y-2 sm:gap-x-6 sm:gap-y-3">
-                        <!-- Checkboxes will be generated here by JS -->
+        <div id="study-view" class="fade-in-up" style="animation-delay: 0.2s;">
+            <main id="verb-tables" class="space-y-10">
+                <!-- JS Generated -->
+            </main>
+        </div>
+
+        <div id="quiz-view" class="hidden-section fade-in-up">
+            <section class="max-w-4xl mx-auto">
+                
+                <div class="glass-panel rounded-3xl shadow-2xl overflow-hidden min-h-[500px] flex flex-col relative">
+                    
+                    <div class="h-3 bg-gradient-to-r from-yellow-400 via-red-500 to-pink-500 w-full"></div>
+
+                    <!-- Lobby -->
+                    <div id="quiz-lobby" class="flex-1 flex flex-col items-center justify-center p-8 text-center bounce-in">
+                        <div class="text-8xl mb-6 animate-bounce">🚀</div>
+                        <h2 class="text-3xl md:text-4xl font-black text-slate-800 mb-4">準備好接受挑戰了嗎？</h2>
+                        <p class="text-xl text-slate-600 mb-10 max-w-md">系統將會隨機出題，測試你對動詞三態的熟悉程度！</p>
+                        
+                        <div class="mb-10 bg-white/50 p-6 rounded-2xl border border-white shadow-inner w-full max-w-2xl">
+                            <h3 class="text-lg font-bold text-slate-700 mb-4 flex items-center justify-center gap-2">
+                                <span class="w-2 h-2 rounded-full bg-blue-500"></span>
+                                選擇測驗範圍
+                                <span class="w-2 h-2 rounded-full bg-blue-500"></span>
+                            </h3>
+                            <div id="category-selector" class="flex flex-wrap justify-center gap-3">
+                                <!-- JS Generated -->
+                            </div>
+                        </div>
+
+                        <button id="start-game-btn" class="btn-3d px-12 py-5 bg-gradient-to-r from-blue-500 to-cyan-500 text-white font-black text-2xl rounded-2xl shadow-xl border-blue-600 hover:brightness-110 active:scale-95 flex items-center gap-3">
+                            開始挑戰 GO!
+                        </button>
                     </div>
-                </div>
 
-                <!-- 調整 padding 和字級 -->
-                <div id="question-container" class="mb-6 p-4 sm:p-6 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg min-h-[100px] flex items-center justify-center shadow-xl">
-                    <p id="question-text" class="text-lg sm:text-xl md:text-2xl font-semibold">點擊「下一題」開始測驗！</p>
-                </div>
+                    <!-- Interface -->
+                    <div id="quiz-interface" class="hidden-section flex-1 flex flex-col p-6 md:p-10">
+                        
+                        <!-- HUD -->
+                        <div class="flex justify-between items-center mb-8">
+                            <button id="back-to-lobby-btn" class="text-sm font-bold text-slate-400 hover:text-slate-600 flex items-center gap-1 transition-colors">
+                                ← 回到設定
+                            </button>
+                            <div class="flex gap-4">
+                                <div class="bg-white px-4 py-2 rounded-xl shadow-sm border border-slate-100 flex flex-col items-center min-w-[100px]">
+                                    <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Score</span>
+                                    <span id="score" class="text-2xl font-black text-blue-600 leading-none">0</span>
+                                </div>
+                                <!-- 上方連對計數器保留，但下面會加新的 -->
+                                <div class="bg-white px-4 py-2 rounded-xl shadow-sm border border-slate-100 flex flex-col items-center min-w-[100px]">
+                                    <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Streak</span>
+                                    <span id="streak" class="text-2xl font-black text-orange-500 leading-none">0</span>
+                                </div>
+                            </div>
+                        </div>
 
-                <div class="flex flex-col sm:flex-row gap-4 justify-center">
-                    <!-- 調整字級 -->
-                    <input type="text" id="answer-input" placeholder="在這裡輸入答案" class="w-full sm:w-1/2 px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out text-base sm:text-lg focus:shadow-lg">
-                    <!-- Button - 樣式更新 -->
-                    <button id="submit-btn" class="px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition transform hover:-translate-y-0.5 hover:bg-blue-700 hover:scale-105">送出答案</button>
+                        <!-- Question Area -->
+                        <div class="flex-1 flex flex-col items-center justify-center max-w-3xl mx-auto w-full">
+                            
+                            <div class="w-full bg-gradient-to-br from-indigo-600 to-purple-700 text-white rounded-2xl p-8 md:p-12 shadow-xl mb-8 text-center relative overflow-hidden group">
+                                <div class="absolute top-0 right-0 p-4 opacity-10 text-9xl font-display select-none pointer-events-none group-hover:scale-110 transition-transform">?</div>
+                                <p id="question-text" class="text-2xl md:text-4xl font-bold leading-relaxed relative z-10">
+                                    Loading...
+                                </p>
+                            </div>
+
+                            <div class="w-full space-y-4">
+                                <input type="text" id="answer-input" autocomplete="off" placeholder="請在此輸入英文答案..." class="w-full text-center text-2xl md:text-3xl font-bold py-5 px-6 rounded-2xl border-4 border-slate-200 focus:border-purple-400 focus:ring-4 focus:ring-purple-100 outline-none transition-all placeholder:text-slate-300 bg-white shadow-inner text-slate-700">
+                                
+                                <!-- 按鈕區域 -->
+                                <div class="h-24 w-full relative flex gap-3">
+                                    <!-- 送出按鈕 (佔滿全寬) -->
+                                    <button id="submit-btn" class="btn-3d w-full h-20 bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-bold text-xl md:text-2xl rounded-2xl shadow-lg border-emerald-600 hover:brightness-110 active:scale-95 transition-all">
+                                        送出答案 (Enter)
+                                    </button>
+                                    
+                                    <!-- 下一題按鈕與連對顯示容器 (隱藏時用 hidden-section) -->
+                                    <div id="next-action-container" class="hidden-section w-full h-20 flex gap-3">
+                                        <!-- 連對顯示 (佔 1/3) -->
+                                        <div class="w-1/3 h-full bg-orange-100 rounded-2xl border-4 border-orange-200 flex flex-col items-center justify-center shadow-inner">
+                                            <span class="text-xs font-bold text-orange-400 uppercase">連對 Streak</span>
+                                            <div id="local-streak" class="text-3xl font-black text-orange-500 flex items-center gap-1">
+                                                🔥 x0
+                                            </div>
+                                        </div>
+
+                                        <!-- 下一題按鈕 (佔 2/3) -->
+                                        <button id="next-question-btn" class="btn-3d flex-1 h-full bg-gradient-to-r from-yellow-400 to-orange-500 text-white font-bold text-xl md:text-2xl rounded-2xl shadow-lg border-yellow-600 hover:brightness-110 active:scale-95 transition-all flex items-center justify-center gap-2 animate-glow-pulse">
+                                            下一題 (Enter) <span>➔</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div id="feedback-container" class="mt-4 h-16 flex items-center justify-center text-xl md:text-2xl font-bold transition-all opacity-0">
+                                <!-- Feedback -->
+                            </div>
+
+                        </div>
+                    </div>
+
                 </div>
-                <!-- Button - 樣式更新 -->
-                 <button id="next-question-btn" class="mt-4 px-8 py-3 bg-green-600 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition transform hover:-translate-y-0.5 hover:bg-green-700 hover:scale-105">下一題</button>
-                <!-- 調整字級 -->
-                <div id="feedback-container" class="mt-4 text-lg sm:text-xl font-bold min-h-[30px]">
-                    <!-- 回饋訊息將顯示於此 -->
-                </div>
-            </div>
-        </section>
+            </section>
+        </div>
 
     </div>
 
     <script>
         const verbData = [
             {
-                title: "1. 規則動詞 (Regular Verbs)",
+                title: "1. 規則動詞 (Regular)",
                 verbs: [
                     { infinitive: 'ask', pastSimple: 'asked', pastParticiple: 'asked', presentParticiple: 'asking', translation: '問' },
                     { infinitive: 'learn', pastSimple: 'learned', pastParticiple: 'learned', presentParticiple: 'learning', translation: '學習' },
@@ -156,7 +264,7 @@
                 ]
             },
             {
-                title: "2. A-A-A 型 (三態同形)",
+                title: "2. A-A-A 型 (同形)",
                 verbs: [
                     { infinitive: 'cost', pastSimple: 'cost', pastParticiple: 'cost', presentParticiple: 'costing', translation: '花費' },
                     { infinitive: 'cut', pastSimple: 'cut', pastParticiple: 'cut', presentParticiple: 'cutting', translation: '割' },
@@ -173,11 +281,11 @@
                 ]
             },
             {
-                title: "3. A-B-B 型 (過去式與過去分詞同形)",
+                title: "3. A-B-B 型 (二態同)",
                 verbs: [
                     { infinitive: 'buy', pastSimple: 'bought', pastParticiple: 'bought', presentParticiple: 'buying', translation: '購買' },
                     { infinitive: 'sell', pastSimple: 'sold', pastParticiple: 'sold', presentParticiple: 'selling', translation: '販賣' },
-                    { infinitive: 'hold', pastSimple: 'held', pastParticiple: 'held', presentParticiple: 'holding', translation: '握住、舉辦' },
+                    { infinitive: 'hold', pastSimple: 'held', pastParticiple: 'held', presentParticiple: 'holding', translation: '握住' },
                     { infinitive: 'tell', pastSimple: 'told', pastParticiple: 'told', presentParticiple: 'telling', translation: '告訴' },
                     { infinitive: 'think', pastSimple: 'thought', pastParticiple: 'thought', presentParticiple: 'thinking', translation: '思考' },
                     { infinitive: 'bring', pastSimple: 'brought', pastParticiple: 'brought', presentParticiple: 'bringing', translation: '帶來' },
@@ -195,27 +303,26 @@
                     { infinitive: 'hear', pastSimple: 'heard', pastParticiple: 'heard', presentParticiple: 'hearing', translation: '聽見' },
                     { infinitive: 'build', pastSimple: 'built', pastParticiple: 'built', presentParticiple: 'building', translation: '興建' },
                     { infinitive: 'bend', pastSimple: 'bent', pastParticiple: 'bent', presentParticiple: 'bending', translation: '彎曲' },
-                    { infinitive: 'burn', pastSimple: 'burnt', pastParticiple: 'burnt', presentParticiple: 'burning', translation: '燃燒;燒焦' },
+                    { infinitive: 'burn', pastSimple: 'burnt', pastParticiple: 'burnt', presentParticiple: 'burning', translation: '燃燒' },
                     { infinitive: 'deal', pastSimple: 'dealt', pastParticiple: 'dealt', presentParticiple: 'dealing', translation: '處理' },
                     { infinitive: 'dig', pastSimple: 'dug', pastParticiple: 'dug', presentParticiple: 'digging', translation: '挖' },
                     { infinitive: 'dive', pastSimple: 'dove', pastParticiple: 'dove', presentParticiple: 'diving', translation: '潛水' },
                     { infinitive: 'feed', pastSimple: 'fed', pastParticiple: 'fed', presentParticiple: 'feeding', translation: '餵' },
-                    { infinitive: 'fight', pastSimple: 'fought', pastParticiple: 'fought', presentParticiple: 'fighting', translation: '打仗;打架' },
+                    { infinitive: 'fight', pastSimple: 'fought', pastParticiple: 'fought', presentParticiple: 'fighting', translation: '打架' },
                     { infinitive: 'get', pastSimple: 'got', pastParticiple: 'got', presentParticiple: 'getting', translation: '得到' },
                     { infinitive: 'hang', pastSimple: 'hung', pastParticiple: 'hung', presentParticiple: 'hanging', translation: '懸掛' },
-                    { infinitive: 'hang', pastSimple: 'hanged', pastParticiple: 'hanged', presentParticiple: 'hanging', translation: '吊死' },
                     { infinitive: 'have', pastSimple: 'had', pastParticiple: 'had', presentParticiple: 'having', translation: '有;吃' },
-                    { infinitive: 'lead', pastSimple: 'led', pastParticiple: 'led', presentParticiple: 'leading', translation: '帶領;領導' },
-                    { infinitive: 'leave', pastSimple: 'left', pastParticiple: 'left', presentParticiple: 'leaving', translation: '留下;離開' },
+                    { infinitive: 'lead', pastSimple: 'led', pastParticiple: 'led', presentParticiple: 'leading', translation: '領導' },
+                    { infinitive: 'leave', pastSimple: 'left', pastParticiple: 'left', presentParticiple: 'leaving', translation: '離開' },
                     { infinitive: 'lend', pastSimple: 'lent', pastParticiple: 'lent', presentParticiple: 'lending', translation: '借出' },
                     { infinitive: 'light', pastSimple: 'lit', pastParticiple: 'lit', presentParticiple: 'lighting', translation: '點燃' },
-                    { infinitive: 'lose', pastSimple: 'lost', pastParticiple: 'lost', presentParticiple: 'losing', translation: '輸;失去;迷路' },
-                    { infinitive: 'make', pastSimple: 'made', pastParticiple: 'made', presentParticiple: 'making', translation: '製造;做' },
+                    { infinitive: 'lose', pastSimple: 'lost', pastParticiple: 'lost', presentParticiple: 'losing', translation: '失去' },
+                    { infinitive: 'make', pastSimple: 'made', pastParticiple: 'made', presentParticiple: 'making', translation: '製作' },
                     { infinitive: 'mean', pastSimple: 'meant', pastParticiple: 'meant', presentParticiple: 'meaning', translation: '意指' },
                     { infinitive: 'pay', pastSimple: 'paid', pastParticiple: 'paid', presentParticiple: 'paying', translation: '付費' },
                     { infinitive: 'say', pastSimple: 'said', pastParticiple: 'said', presentParticiple: 'saying', translation: '說' },
-                    { infinitive: 'shine', pastSimple: 'shone', pastParticiple: 'shone', presentParticiple: 'shining', translation: '照耀;閃光' },
-                    { infinitive: 'shoot', pastSimple: 'shot', pastParticiple: 'shot', presentParticiple: 'shooting', translation: '投射;開槍' },
+                    { infinitive: 'shine', pastSimple: 'shone', pastParticiple: 'shone', presentParticiple: 'shining', translation: '照耀' },
+                    { infinitive: 'shoot', pastSimple: 'shot', pastParticiple: 'shot', presentParticiple: 'shooting', translation: '射擊' },
                     { infinitive: 'sit', pastSimple: 'sat', pastParticiple: 'sat', presentParticiple: 'sitting', translation: '坐' },
                     { infinitive: 'smell', pastSimple: 'smelt', pastParticiple: 'smelt', presentParticiple: 'smelling', translation: '聞' },
                     { infinitive: 'spell', pastSimple: 'spelt', pastParticiple: 'spelt', presentParticiple: 'spelling', translation: '拼字' },
@@ -226,7 +333,7 @@
                 ]
             },
             {
-                title: "4. A-B-C 型 (三態皆不同形)",
+                title: "4. A-B-C 型 (全異)",
                 verbs: [
                     { infinitive: 'ride', pastSimple: 'rode', pastParticiple: 'ridden', presentParticiple: 'riding', translation: '騎' },
                     { infinitive: 'drive', pastSimple: 'drove', pastParticiple: 'driven', presentParticiple: 'driving', translation: '開車' },
@@ -247,32 +354,32 @@
                     { infinitive: 'grow', pastSimple: 'grew', pastParticiple: 'grown', presentParticiple: 'growing', translation: '生長' },
                     { infinitive: 'swim', pastSimple: 'swam', pastParticiple: 'swum', presentParticiple: 'swimming', translation: '游泳' },
                     { infinitive: 'do', pastSimple: 'did', pastParticiple: 'done', presentParticiple: 'doing', translation: '做' },
-                    { infinitive: 'be', pastSimple: 'was/were', pastParticiple: 'been', presentParticiple: 'being', translation: '(be動詞)是' },
+                    { infinitive: 'be', pastSimple: 'was/were', pastParticiple: 'been', presentParticiple: 'being', translation: '是' },
                     { infinitive: 'bear', pastSimple: 'bore', pastParticiple: 'born', presentParticiple: 'bearing', translation: '生' },
-                    { infinitive: 'beat', pastSimple: 'beat', pastParticiple: 'beaten', presentParticiple: 'beating', translation: '打;打敗' },
+                    { infinitive: 'beat', pastSimple: 'beat', pastParticiple: 'beaten', presentParticiple: 'beating', translation: '打敗' },
                     { infinitive: 'bite', pastSimple: 'bit', pastParticiple: 'bitten', presentParticiple: 'biting', translation: '咬' },
                     { infinitive: 'blow', pastSimple: 'blew', pastParticiple: 'blown', presentParticiple: 'blowing', translation: '吹' },
-                    { infinitive: 'draw', pastSimple: 'drew', pastParticiple: 'drawn', presentParticiple: 'drawing', translation: '畫;繪製' },
+                    { infinitive: 'draw', pastSimple: 'drew', pastParticiple: 'drawn', presentParticiple: 'drawing', translation: '畫' },
                     { infinitive: 'forgive', pastSimple: 'forgave', pastParticiple: 'forgiven', presentParticiple: 'forgiving', translation: '原諒' },
-                    { infinitive: 'freeze', pastSimple: 'froze', pastParticiple: 'frozen', presentParticiple: 'freezing', translation: '凝固;結冰' },
-                    { infinitive: 'get', pastSimple: 'got', pastParticiple: 'got/gotten', presentParticiple: 'getting', translation: '獲得' },
+                    { infinitive: 'freeze', pastSimple: 'froze', pastParticiple: 'frozen', presentParticiple: 'freezing', translation: '凍結' },
+                    { infinitive: 'get', pastSimple: 'got', pastParticiple: 'gotten', presentParticiple: 'getting', translation: '獲得' },
                     { infinitive: 'give', pastSimple: 'gave', pastParticiple: 'given', presentParticiple: 'giving', translation: '給' },
                     { infinitive: 'hide', pastSimple: 'hid', pastParticiple: 'hidden', presentParticiple: 'hiding', translation: '躲藏' },
-                    { infinitive: 'lie', pastSimple: 'lay', pastParticiple: 'lain', presentParticiple: 'lying', translation: '躺著' },
+                    { infinitive: 'lie', pastSimple: 'lay', pastParticiple: 'lain', presentParticiple: 'lying', translation: '躺' },
                     { infinitive: 'ring', pastSimple: 'rang', pastParticiple: 'rung', presentParticiple: 'ringing', translation: '鈴響' },
-                    { infinitive: 'rise', pastSimple: 'rose', pastParticiple: 'risen', presentParticiple: 'rising', translation: '起立' },
+                    { infinitive: 'rise', pastSimple: 'rose', pastParticiple: 'risen', presentParticiple: 'rising', translation: '上升' },
                     { infinitive: 'show', pastSimple: 'showed', pastParticiple: 'shown', presentParticiple: 'showing', translation: '展示' },
-                    { infinitive: 'sing', pastSimple: 'sang', pastParticiple: 'sung', presentParticiple: 'singing', translation: '唱歌' },
+                    { infinitive: 'sing', pastSimple: 'sang', pastParticiple: 'sung', presentParticiple: 'singing', translation: '唱' },
                     { infinitive: 'steal', pastSimple: 'stole', pastParticiple: 'stolen', presentParticiple: 'stealing', translation: '偷' },
-                    { infinitive: 'take', pastSimple: 'took', pastParticiple: 'taken', presentParticiple: 'taking', translation: '帶(往)' },
-                    { infinitive: 'throw', pastSimple: 'threw', pastParticiple: 'thrown', presentParticiple: 'throwing', translation: '投擲' },
+                    { infinitive: 'take', pastSimple: 'took', pastParticiple: 'taken', presentParticiple: 'taking', translation: '拿' },
+                    { infinitive: 'throw', pastSimple: 'threw', pastParticiple: 'thrown', presentParticiple: 'throwing', translation: '丟' },
                     { infinitive: 'wake', pastSimple: 'woke', pastParticiple: 'woken', presentParticiple: 'waking', translation: '醒來' },
-                    { infinitive: 'wear', pastSimple: 'wore', pastParticiple: 'worn', presentParticiple: 'wearing', translation: '穿戴' },
+                    { infinitive: 'wear', pastSimple: 'wore', pastParticiple: 'worn', presentParticiple: 'wearing', translation: '穿' },
                     { infinitive: 'write', pastSimple: 'wrote', pastParticiple: 'written', presentParticiple: 'writing', translation: '寫' }
                 ]
             },
             {
-                title: "5. A-B-A 型 (原形與過去分詞同形)",
+                title: "5. A-B-A 型 (迴旋)",
                 verbs: [
                     { infinitive: 'run', pastSimple: 'ran', pastParticiple: 'run', presentParticiple: 'running', translation: '跑' },
                     { infinitive: 'come', pastSimple: 'came', pastParticiple: 'come', presentParticiple: 'coming', translation: '來' },
@@ -285,60 +392,62 @@
         let currentQuestion = null;
         let score = 0;
         let streak = 0;
+        let isQuestionAnswered = false;
         
         // DOM Elements
         const verbTablesContainer = document.getElementById('verb-tables');
         const questionText = document.getElementById('question-text');
         const answerInput = document.getElementById('answer-input');
         const submitBtn = document.getElementById('submit-btn');
+        const nextActionContainer = document.getElementById('next-action-container');
         const nextQuestionBtn = document.getElementById('next-question-btn');
+        const localStreakEl = document.getElementById('local-streak');
+        
         const feedbackContainer = document.getElementById('feedback-container');
         const scoreEl = document.getElementById('score');
         const streakEl = document.getElementById('streak');
         const categorySelectorEl = document.getElementById('category-selector');
+        
+        const quizLobby = document.getElementById('quiz-lobby');
+        const quizInterface = document.getElementById('quiz-interface');
+        const startGameBtn = document.getElementById('start-game-btn');
+        const backToLobbyBtn = document.getElementById('back-to-lobby-btn');
 
-        // --- 新增：用於儲存選擇的語音 ---
+        // Tabs
+        const tabStudy = document.getElementById('tab-study');
+        const tabQuiz = document.getElementById('tab-quiz');
+        const studyView = document.getElementById('study-view');
+        const quizView = document.getElementById('quiz-view');
+
+        // Voice
         let selectedVoice = null;
 
-        // --- 新增：載入並篩選語音的函數 ---
         function loadVoices() {
             const voices = speechSynthesis.getVoices();
-            // 優先尋找高品質的 Google 語音 (如果可用)
             selectedVoice = voices.find(voice => voice.name === 'Google US English' && voice.lang === 'en-US');
             
             if (!selectedVoice) {
-                // 備用方案：尋找其他標記為 'Female' 的 en-US 語音
                 selectedVoice = voices.find(voice => 
                     voice.lang === 'en-US' && 
-                    (voice.name.includes('Female') || voice.name.includes('Samantha') || voice.name.includes('Fiona')) // 增加常見女性語音名稱
+                    (voice.name.includes('Female') || voice.name.includes('Samantha') || voice.name.includes('Fiona'))
                 );
             }
-            
             if (!selectedVoice) {
-                // 最後備案：隨便找一個 en-US 語音
                  selectedVoice = voices.find(voice => voice.lang === 'en-US');
             }
         }
 
-        // --- Functions ---
-
-        // 升級後的語音功能，可以處理單一或連續播放
-        function speak(texts, iconElement = null) { // 接受 iconElement
-            if (!('speechSynthesis' in window)) {
-                console.error("Sorry, your browser doesn't support text-to-speech.");
-                return;
-            }
+        function speak(texts, iconElement = null) {
+            if (!('speechSynthesis' in window)) return;
             
             const wordsToSpeak = Array.isArray(texts) ? texts : [texts];
             if (wordsToSpeak.length === 0) return;
 
-            // 停止當前所有朗讀並重置所有按鈕
             speechSynthesis.cancel(); 
             document.querySelectorAll('.speaker-icon.active').forEach(icon => {
                 icon.classList.remove('active');
             });
 
-            // 啟動當前點擊的按鈕
             if (iconElement) {
                 iconElement.classList.add('active');
             }
@@ -348,15 +457,10 @@
             function speakNext() {
                 if (currentIndex < wordsToSpeak.length) {
                     const utterance = new SpeechSynthesisUtterance(wordsToSpeak[currentIndex]);
-                    
-                    // --- 這裡是關鍵修改 ---
                     utterance.lang = 'en-US';
-                    if (selectedVoice) { // 如果找到了偏好的語音
-                        utterance.voice = selectedVoice;
-                    }
-                    utterance.pitch = 1; // 設置為 1 聽起來比較自然
-                    utterance.rate = 1;  // 設置為 1 聽起來比較自然
-                    // --- 修改結束 ---
+                    if (selectedVoice) utterance.voice = selectedVoice;
+                    utterance.pitch = 1.1; 
+                    utterance.rate = 0.9; 
 
                     utterance.onend = () => {
                         currentIndex++;
@@ -364,7 +468,6 @@
                     };
                     speechSynthesis.speak(utterance);
                 } else {
-                    // 朗讀序列結束，移除 active class
                     if (iconElement) {
                         iconElement.classList.remove('active');
                     }
@@ -375,84 +478,100 @@
 
         function createSpeakerIcon() {
             const icon = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-            icon.setAttribute("class", "speaker-icon h-6 w-6");
+            icon.setAttribute("class", "speaker-icon h-5 w-5 md:h-6 md:w-6");
             icon.setAttribute("fill", "none");
             icon.setAttribute("viewBox", "0 0 24 24");
             icon.setAttribute("stroke", "currentColor");
-            icon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />`;
+            icon.setAttribute("stroke-width", "2.5");
+            icon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />`;
             return icon;
         }
 
-        // 創建單一單字播放按鈕的儲存格
-        function createTableCell(text) {
-            const cell = document.createElement('td');
-            // 調整字級
-            cell.className = 'px-4 py-3 text-center text-sm sm:text-base md:text-lg';
-            const contentDiv = document.createElement('div');
-            contentDiv.className = 'table-cell-content';
-            contentDiv.appendChild(document.createTextNode(text));
-            if (/^[a-zA-Z]+$/.test(text)) {
-                 const speakerIcon = createSpeakerIcon();
-                // 傳遞 speakerIcon 本身到 speak 函數
-                speakerIcon.addEventListener('click', () => speak(text, speakerIcon));
-                contentDiv.appendChild(speakerIcon);
+        function createTableCell(text, isHeader = false) {
+            const cell = document.createElement(isHeader ? 'th' : 'td');
+            cell.className = isHeader 
+                ? 'px-4 py-4 text-center text-sm font-bold text-slate-500 uppercase tracking-wider bg-slate-50 border-b border-slate-200' 
+                : 'px-4 py-4 text-center text-base md:text-lg text-slate-700 font-medium border-b border-slate-100 group-last:border-0';
+            
+            if (!isHeader) {
+                const contentDiv = document.createElement('div');
+                contentDiv.className = 'table-cell-content';
+                contentDiv.appendChild(document.createTextNode(text));
+                
+                if (/^[a-zA-Z\s/]+$/.test(text)) { 
+                     const speakerIcon = createSpeakerIcon();
+                    speakerIcon.addEventListener('click', (e) => {
+                        e.stopPropagation(); 
+                        speak(text, speakerIcon);
+                    });
+                    contentDiv.appendChild(speakerIcon);
+                }
+                cell.appendChild(contentDiv);
+            } else {
+                cell.textContent = text;
             }
-            cell.appendChild(contentDiv);
             return cell;
         }
         
-        // 新增：創建連續播放按鈕的儲存格
-        function createPlayAllCell(verb) {
-            const cell = document.createElement('td');
-            cell.className = 'px-2 py-3 text-center';
-            const speakerIcon = createSpeakerIcon();
-            speakerIcon.addEventListener('click', () => {
-                // 傳遞 speakerIcon 本身到 speak 函數 (包含 V-ing)
-                speak([verb.infinitive, verb.pastSimple, verb.pastParticiple, verb.presentParticiple], speakerIcon);
-            });
-            cell.appendChild(speakerIcon);
+        function createPlayAllCell(verb, isHeader = false) {
+            const cell = document.createElement(isHeader ? 'th' : 'td');
+            cell.className = isHeader
+                ? 'px-2 py-4 text-center text-sm font-bold text-slate-500 uppercase tracking-wider bg-slate-50 border-b border-slate-200'
+                : 'px-2 py-4 text-center border-b border-slate-100 group-last:border-0';
+
+            if (!isHeader) {
+                const button = document.createElement('button');
+                button.className = 'p-2 rounded-full bg-blue-100 hover:bg-blue-200 text-blue-600 transition-colors';
+                button.innerHTML = '▶';
+                button.title = "播放整行";
+                button.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const icon = button; 
+                    speak([verb.infinitive, verb.pastSimple, verb.pastParticiple, verb.presentParticiple], null);
+                });
+                cell.appendChild(button);
+            } else {
+                cell.textContent = "全播";
+            }
             return cell;
         }
 
         function renderTables() {
             verbData.forEach(group => {
                 const section = document.createElement('section');
-                // 調整 padding
-                section.className = 'p-4 sm:p-6 md:p-8 bg-white rounded-2xl shadow-2xl';
+                section.className = 'glass-panel rounded-3xl shadow-lg overflow-hidden transition-all hover:shadow-xl';
+                
                 const header = document.createElement('div');
-                header.className = 'mb-4';
+                header.className = 'bg-gradient-to-r from-blue-500/10 to-purple-500/10 p-5 border-b border-white/50';
                 const title = document.createElement('h2');
-                // 調整字級
-                title.className = 'text-xl sm:text-2xl md:text-3xl font-bold text-gray-900';
-                title.textContent = group.title;
+                title.className = 'text-xl md:text-2xl font-bold text-slate-800 flex items-center gap-2';
+                title.innerHTML = `<span class="text-2xl">📌</span> ${group.title}`;
                 header.appendChild(title);
                 section.appendChild(header);
+
                 const tableContainer = document.createElement('div');
                 tableContainer.className = 'overflow-x-auto';
                 const table = document.createElement('table');
-                table.className = 'min-w-full divide-y-2 divide-gray-200';
+                table.className = 'min-w-full';
 
-                // 表格標頭樣式更新
                 const thead = document.createElement('thead');
-                thead.className = 'bg-gray-200'; // 加深標頭背景
-                thead.innerHTML = `<tr>
-                        <th class="px-2 py-4 text-center text-sm font-bold text-gray-800 uppercase tracking-wider">播放</th>
-                        <th class="px-4 py-4 text-center text-sm font-bold text-gray-800 uppercase tracking-wider">原形動詞</th>
-                        <th class="px-4 py-4 text-center text-sm font-bold text-gray-800 uppercase tracking-wider">過去簡單式</th>
-                        <th class="px-4 py-4 text-center text-sm font-bold text-gray-800 uppercase tracking-wider">過去分詞</th>
-                        <th class="px-4 py-4 text-center text-sm font-bold text-gray-800 uppercase tracking-wider">現在分詞 (V-ing)</th>
-                        <th class="px-4 py-4 text-center text-sm font-bold text-gray-800 uppercase tracking-wider">中文翻譯</th></tr>`;
+                const headerRow = document.createElement('tr');
+                ['全播', '原形', '過去式', '過去分詞', 'V-ing', '中文'].forEach(text => {
+                    headerRow.appendChild(createTableCell(text, true));
+                });
+                thead.appendChild(headerRow);
                 table.appendChild(thead);
 
                 const tbody = document.createElement('tbody');
-                tbody.className = 'bg-white divide-y divide-gray-200';
+                tbody.className = 'bg-white';
                 group.verbs.forEach(verb => {
                     const row = document.createElement('tr');
-                    row.appendChild(createPlayAllCell(verb)); // 新增的儲存格
+                    row.className = 'table-row-hover group';
+                    row.appendChild(createPlayAllCell(verb));
                     row.appendChild(createTableCell(verb.infinitive));
                     row.appendChild(createTableCell(verb.pastSimple));
                     row.appendChild(createTableCell(verb.pastParticiple));
-                    row.appendChild(createTableCell(verb.presentParticiple)); // 新增 V-ing 欄位
+                    row.appendChild(createTableCell(verb.presentParticiple));
                     row.appendChild(createTableCell(verb.translation));
                     tbody.appendChild(row);
                 });
@@ -464,22 +583,24 @@
         }
         
         function renderCategorySelector() {
+            categorySelectorEl.innerHTML = '';
             verbData.forEach((group, index) => {
-                const container = document.createElement('div');
-                container.className = 'flex items-center';
+                const container = document.createElement('label');
+                container.className = 'cursor-pointer select-none group relative';
+                
                 const input = document.createElement('input');
                 input.type = 'checkbox';
                 input.id = `category-${index}`;
                 input.value = index;
                 input.checked = true;
-                input.className = 'h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer';
-                const label = document.createElement('label');
-                label.htmlFor = `category-${index}`;
-                label.textContent = group.title.split(' ')[1]; // e.g., "規則動詞"
-                // 調整字級
-                label.className = 'ml-2 text-sm sm:text-md text-gray-700 cursor-pointer select-none';
+                input.className = 'peer sr-only'; 
+                
+                const visual = document.createElement('div');
+                visual.className = 'px-4 py-2 bg-white border-2 border-slate-200 rounded-xl text-slate-500 font-bold transition-all peer-checked:border-blue-500 peer-checked:text-blue-600 peer-checked:bg-blue-50 hover:bg-slate-50';
+                visual.textContent = group.title.split(' ')[1]; 
+
                 container.appendChild(input);
-                container.appendChild(label);
+                container.appendChild(visual);
                 categorySelectorEl.appendChild(container);
             });
         }
@@ -487,12 +608,35 @@
         function updateScoreboard() {
             scoreEl.textContent = score;
             streakEl.textContent = streak;
-            scoreEl.classList.add('scale-110');
-            streakEl.classList.add('scale-110');
-            setTimeout(() => {
-                scoreEl.classList.remove('scale-110');
-                streakEl.classList.remove('scale-110');
-            }, 200);
+            
+            // 更新按鈕旁的連對計數
+            localStreakEl.innerHTML = `🔥 x${streak}`;
+            
+            // 數字跳動動畫
+            scoreEl.parentElement.classList.add('scale-110');
+            setTimeout(() => scoreEl.parentElement.classList.remove('scale-110'), 150);
+        }
+
+        function startGame() {
+            const selectedCategories = Array.from(document.querySelectorAll('#category-selector input:checked'));
+            if (selectedCategories.length === 0) {
+                alert("請至少選擇一個範圍喔！😅");
+                return;
+            }
+
+            quizLobby.classList.add('hidden-section');
+            quizInterface.classList.remove('hidden-section');
+            
+            score = 0;
+            streak = 0;
+            updateScoreboard();
+
+            generateQuestion();
+        }
+
+        function returnToLobby() {
+            quizInterface.classList.add('hidden-section');
+            quizLobby.classList.remove('hidden-section');
         }
 
         function generateQuestion() {
@@ -501,28 +645,25 @@
                 .filter((group, index) => selectedCategories.includes(index))
                 .flatMap(group => group.verbs);
 
-            if (quizPool.length === 0) {
-                // 更新提示文字顏色
-                questionText.innerHTML = `<span class="text-yellow-300 font-semibold">請至少選擇一個測驗範圍！</span>`;
-                currentQuestion = null;
-                return;
-            }
+            if (quizPool.length === 0) return;
 
             const randomVerb = quizPool[Math.floor(Math.random() * quizPool.length)];
-            
-            // --- 更新測驗邏輯，加入 V-ing ---
             const types = ['pastSimple', 'pastParticiple', 'presentParticiple'];
             const questionType = types[Math.floor(Math.random() * types.length)];
+            
             let typeText = '';
-
+            let typeColorClass = '';
+            
             if (questionType === 'pastSimple') {
-                typeText = '過去簡單式';
+                typeText = '過去式';
+                typeColorClass = 'text-yellow-300';
             } else if (questionType === 'pastParticiple') {
                 typeText = '過去分詞';
+                typeColorClass = 'text-green-300';
             } else {
-                typeText = '現在分詞 (V-ing)';
+                typeText = 'V-ing';
+                typeColorClass = 'text-pink-300';
             }
-            // --- 測驗邏輯更新完畢 ---
             
             currentQuestion = {
                 verb: randomVerb,
@@ -530,15 +671,31 @@
                 answer: randomVerb[questionType]
             };
 
-            // 更新問題文字顏色
-            questionText.innerHTML = `「<strong class="text-yellow-300">${randomVerb.infinitive}</strong>」的${typeText}是什麼？`;
-            speak(randomVerb.infinitive);
+            questionText.innerHTML = `
+                <div class="text-sm uppercase tracking-widest opacity-70 mb-2">Quiz Time</div>
+                <span class="text-5xl md:text-6xl font-black block mb-4 filter drop-shadow-lg">${randomVerb.infinitive}</span>
+                <div class="text-xl font-medium opacity-90">
+                    請輸入 <span class="${typeColorClass} font-bold underline decoration-wavy underline-offset-4">${typeText}</span>
+                </div>
+            `;
+            
+            // 修改處：念出答案 (取代原本念 infinitive)
+            // 將斜線替換為 " or " 避免念出符號名稱
+            speak(currentQuestion.answer.replace('/', ' or '));
             
             answerInput.value = '';
             answerInput.disabled = false;
-            submitBtn.disabled = false;
-            feedbackContainer.textContent = '';
             answerInput.focus();
+            answerInput.parentElement.classList.remove('opacity-50'); 
+            
+            // UI 重置：顯示送出，隱藏下一題
+            submitBtn.classList.remove('hidden-section');
+            nextActionContainer.classList.add('hidden-section');
+            
+            feedbackContainer.innerHTML = '';
+            feedbackContainer.className = 'mt-4 h-16 flex items-center justify-center text-xl md:text-2xl font-bold transition-all opacity-0';
+            
+            isQuestionAnswered = false;
         }
 
         function checkAnswer() {
@@ -547,56 +704,100 @@
             const userAnswer = answerInput.value.trim().toLowerCase();
             const correctAnswer = currentQuestion.answer.toLowerCase();
 
+            feedbackContainer.classList.remove('opacity-0');
+
             if (userAnswer === '') {
-                feedbackContainer.textContent = '請輸入答案！';
-                // 調整字級
-                feedbackContainer.className = 'mt-4 text-lg sm:text-xl font-bold text-yellow-500 min-h-[30px]';
+                feedbackContainer.innerHTML = '<span class="text-amber-500 animate-pulse">⚡ 請輸入答案！</span>';
                 return;
             }
 
+            // 準備要念的答案發音
+            const answerSpeech = currentQuestion.answer.replace('/', ' or ');
+
             if (userAnswer === correctAnswer) {
-                feedbackContainer.textContent = `答對了！答案是 ${currentQuestion.answer}`;
-                // 調整字級
-                feedbackContainer.className = 'mt-4 text-lg sm:text-xl font-bold text-green-500 min-h-[30px]';
-                score++;
+                feedbackContainer.innerHTML = `
+                    <div class="flex items-center gap-2 text-emerald-500 bounce-in">
+                        <span class="text-3xl">🎉</span> 
+                        <span>答對了！ ${currentQuestion.answer}</span>
+                    </div>`;
+                score += 10;
                 streak++;
-                speak('Correct');
+                // 修改處：答對時念 "Correct! [Answer]"
+                speak(['Correct', answerSpeech]);
             } else {
-                feedbackContainer.textContent = `答錯了，正確答案是 ${currentQuestion.answer}`;
-                // 調整字級
-                feedbackContainer.className = 'mt-4 text-lg sm:text-xl font-bold text-red-500 min-h-[30px]';
+                feedbackContainer.innerHTML = `
+                    <div class="flex items-center gap-2 text-rose-500 bounce-in">
+                        <span class="text-3xl">💥</span>
+                        <span>錯了喔... 是 ${currentQuestion.answer}</span>
+                    </div>`;
                 streak = 0;
-                speak('Incorrect');
+                // 修改處：答錯時念 "Incorrect. [Answer]"
+                speak(['Incorrect', answerSpeech]);
             }
             
             updateScoreboard();
+            
             answerInput.disabled = true;
-            submitBtn.disabled = true;
+            answerInput.parentElement.classList.add('opacity-50'); 
+            
+            // UI 切換：隱藏送出，顯示下一題區域 (包含連對)
+            submitBtn.classList.add('hidden-section');
+            nextActionContainer.classList.remove('hidden-section');
+            nextQuestionBtn.focus();
+            
+            isQuestionAnswered = true;
         }
 
-        // --- Event Listeners & Initialization ---
+        // --- Tab Logic ---
+        function switchTab(mode) {
+            if (mode === 'study') {
+                studyView.classList.remove('hidden-section');
+                quizView.classList.add('hidden-section');
+                
+                tabStudy.classList.remove('text-slate-500', 'hover:bg-slate-100');
+                tabStudy.classList.add('bg-gradient-to-r', 'from-violet-500', 'to-fuchsia-500', 'text-white', 'shadow-md', 'scale-105');
+                
+                tabQuiz.classList.remove('bg-gradient-to-r', 'from-violet-500', 'to-fuchsia-500', 'text-white', 'shadow-md', 'scale-105');
+                tabQuiz.classList.add('text-slate-500', 'hover:bg-slate-100');
 
+            } else {
+                studyView.classList.add('hidden-section');
+                quizView.classList.remove('hidden-section');
+                
+                tabQuiz.classList.remove('text-slate-500', 'hover:bg-slate-100');
+                tabQuiz.classList.add('bg-gradient-to-r', 'from-violet-500', 'to-fuchsia-500', 'text-white', 'shadow-md', 'scale-105');
+                
+                tabStudy.classList.remove('bg-gradient-to-r', 'from-violet-500', 'to-fuchsia-500', 'text-white', 'shadow-md', 'scale-105');
+                tabStudy.classList.add('text-slate-500', 'hover:bg-slate-100');
+            }
+        }
+
+        tabStudy.addEventListener('click', () => switchTab('study'));
+        tabQuiz.addEventListener('click', () => switchTab('quiz'));
+        
+        startGameBtn.addEventListener('click', startGame);
+        backToLobbyBtn.addEventListener('click', returnToLobby);
         nextQuestionBtn.addEventListener('click', generateQuestion);
         submitBtn.addEventListener('click', checkAnswer);
-        answerInput.addEventListener('keypress', (event) => {
-            if (event.key === 'Enter') {
-                checkAnswer();
+
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter' && !quizView.classList.contains('hidden-section') && !quizInterface.classList.contains('hidden-section')) {
+                if (isQuestionAnswered) {
+                    generateQuestion();
+                } else {
+                    checkAnswer();
+                }
             }
         });
 
-        // --- 新增：確保語音列表被載入 ---
         loadVoices();
         if (speechSynthesis.onvoiceschanged !== undefined) {
             speechSynthesis.onvoiceschanged = loadVoices;
         }
-        // --- 新增結束 ---
 
-
-        // Initial setup
         renderTables();
         renderCategorySelector();
         updateScoreboard();
     </script>
-
 </body>
 </html>
