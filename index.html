@@ -2,11 +2,9 @@
 <html lang="zh-Hant">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>動詞三態互動學習網</title>
-    <!-- 引入 Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- 引入字型 -->
     <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
     <script>
         tailwind.config = {
@@ -40,10 +38,6 @@
             min-height: 100vh;
             -webkit-overflow-scrolling: touch;
             overflow-x: hidden;
-            user-select: none; 
-            -webkit-user-select: none;
-            /* 確保內容不會被瀏海遮住 */
-            padding-bottom: env(safe-area-inset-bottom);
         }
 
         .btn-3d {
@@ -58,105 +52,141 @@
             margin-top: 2px;
         }
 
+        .blob {
+            position: absolute;
+            filter: blur(80px);
+            z-index: -1;
+            animation: float 10s infinite ease-in-out alternate;
+        }
+        .blob-1 { top: -10%; left: -10%; width: 500px; height: 500px; background: rgba(255, 154, 158, 0.4); animation-delay: 0s; }
+        .blob-2 { bottom: -10%; right: -10%; width: 400px; height: 400px; background: rgba(161, 140, 209, 0.4); animation-delay: -5s; }
+        .blob-3 { top: 40%; left: 40%; width: 300px; height: 300px; background: rgba(251, 194, 235, 0.3); animation-delay: -2s; }
+
+        @keyframes float {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(30px, 50px) scale(1.1); }
+        }
+
         .glass-panel {
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.5);
         }
 
-        /* 表格樣式優化 */
+        /* --- 表格樣式優化 --- */
         .table-row-base {
-            transition: background-color 0.2s;
+            transition: all 0.2s;
         }
         
+        /* 1. 橫向選中 (Selected Row) - 黃色 */
         .selected-row {
             background-color: #fef08a !important; /* amber-200 */
-            position: relative;
+            transform: scale(1.02);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
             z-index: 10;
+            position: relative;
+            border-radius: 8px;
         }
+        .selected-row td:first-child { border-top-left-radius: 8px; border-bottom-left-radius: 8px; }
+        .selected-row td:last-child { border-top-right-radius: 8px; border-bottom-right-radius: 8px; }
 
+        /* 2. 直向選中 (Selected Column) - 藍色 */
         .selected-col {
             background-color: #e0f2fe !important; /* sky-100 */
         }
         
+        /* 表頭直向選中 */
         th.selected-col-header {
             background-color: #bae6fd !important; /* sky-200 */
             color: #0369a1; /* sky-700 */
             border-bottom: 2px solid #0ea5e9;
         }
         
+        /* 3. 交集處 (Intersection) - 深黃色強調 */
         .selected-row td.selected-col {
             background-color: #fcd34d !important; /* amber-300 */
             font-weight: 800;
             color: #000;
-            border: 2px solid #f59e0b;
+            border: 2px solid #f59e0b; /* amber-500 border */
         }
         
-        th { cursor: pointer; }
+        /* 可點擊提示 */
+        th { cursor: pointer; transition: background-color 0.2s; user-select: none; }
+        th:hover { background-color: #f0f9ff; }
+
 
         .speaker-icon {
             cursor: pointer;
             color: #6366f1;
-            padding: 8px;
-            margin: -6px;
+            transition: all 0.2s;
+            padding: 2px; 
         }
-        .speaker-icon:active {
+        .speaker-icon:active, .speaker-icon:hover {
+            color: #4338ca;
+            transform: scale(1.2);
+        }
+        .speaker-icon.active {
             color: #ec4899;
-            transform: scale(1.1);
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
         }
 
         .hidden-section { display: none !important; }
 
-        /* 移除容易造成問題的淡入動畫，改用簡單的顯示邏輯 */
+        .bounce-in { animation: bounceIn 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55); }
+        @keyframes bounceIn {
+            0% { opacity: 0; transform: scale(0.3); }
+            50% { opacity: 1; transform: scale(1.05); }
+            70% { transform: scale(0.9); }
+            100% { transform: scale(1); }
+        }
         
-        input[type="text"] {
+        .fade-in-up { animation: fadeInUp 0.5s ease-out; }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* 新增：答錯時的震動動畫 */
+        .shake {
+            animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+        }
+        @keyframes shake {
+            10%, 90% { transform: translate3d(-2px, 0, 0); }
+            20%, 80% { transform: translate3d(4px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-8px, 0, 0); }
+            40%, 60% { transform: translate3d(8px, 0, 0); }
+        }
+        
+        input[type="text"], input[type="number"] {
             -webkit-appearance: none;
             border-radius: 1rem;
-            font-size: 16px; 
-        }
-
-        .category-label.active {
-            border-color: #3b82f6; 
-            background-color: #eff6ff; 
-            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-        }
-        
-        /* 錯誤訊息樣式 */
-        #error-log {
-            display: none;
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            background: rgba(220, 38, 38, 0.9);
-            color: white;
-            padding: 10px;
-            font-size: 12px;
-            z-index: 9999;
-            text-align: left;
-            white-space: pre-wrap;
         }
     </style>
 </head>
-<body class="text-slate-700 antialiased">
+<body class="text-slate-700 antialiased selection:bg-purple-200 selection:text-purple-900">
 
-    <!-- 用於顯示 JS 錯誤，方便除錯 -->
-    <div id="error-log"></div>
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="blob blob-3"></div>
 
     <div class="container mx-auto px-3 py-6 md:px-4 md:py-8 max-w-6xl relative z-10">
         
-        <header class="text-center mb-8">
+        <header class="text-center mb-8 fade-in-up">
             <h1 class="text-3xl md:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600 tracking-tight font-display drop-shadow-sm mb-3 md:mb-4">
                 動詞三態大挑戰
             </h1>
-            <p class="text-xs md:text-xl text-slate-600 font-medium bg-white/60 inline-block px-4 py-2 rounded-full shadow-sm backdrop-blur-sm">
-                🎧 點擊喇叭聽發音 · 👆 點擊行列做標記
+            <p class="text-sm md:text-xl text-slate-600 font-medium bg-white/60 inline-block px-4 py-2 rounded-full shadow-sm backdrop-blur-sm">
+                🎧 點擊喇叭聽發音 · 👆 點擊行列做標記 · 🚀 切換分頁闖關
             </p>
         </header>
 
         <!-- 導航按鈕 -->
-        <div class="flex justify-center mb-8">
+        <div class="flex justify-center mb-8 fade-in-up" style="animation-delay: 0.1s;">
             <div class="bg-white/80 p-1.5 md:p-2 rounded-2xl shadow-lg backdrop-blur flex gap-2 w-full max-w-md md:w-auto">
                 <button id="tab-study" class="flex-1 md:flex-none px-4 md:px-8 py-3 rounded-xl font-bold text-base md:text-lg transition-all duration-300 flex items-center justify-center gap-2 bg-gradient-to-r from-violet-500 to-fuchsia-500 text-white shadow-md transform scale-100 md:scale-105">
                     <span>📖</span> <span class="hidden md:inline">單字表</span>學習
@@ -167,18 +197,15 @@
             </div>
         </div>
 
-        <!-- 學習區塊 (預設加入文字，若 JS 失敗看得到) -->
-        <div id="study-view" class="pb-10">
+        <!-- 學習區塊 -->
+        <div id="study-view" class="fade-in-up pb-10" style="animation-delay: 0.2s;">
             <main id="verb-tables" class="space-y-8 md:space-y-10">
-                <div class="text-center p-10 text-slate-500 bg-white/50 rounded-xl">
-                    <p class="text-xl font-bold animate-pulse">正在準備課程資料...</p>
-                    <p class="text-sm mt-2">如果長時間停留在此，請嘗試重新整理</p>
-                </div>
+                <!-- JS Generated -->
             </main>
         </div>
 
         <!-- 測驗區塊 -->
-        <div id="quiz-view" class="hidden-section pb-10">
+        <div id="quiz-view" class="hidden-section fade-in-up pb-10">
             <section class="max-w-4xl mx-auto">
                 
                 <div class="glass-panel rounded-3xl shadow-2xl overflow-hidden min-h-[500px] flex flex-col relative">
@@ -186,8 +213,8 @@
                     <div class="h-3 bg-gradient-to-r from-yellow-400 via-red-500 to-pink-500 w-full"></div>
 
                     <!-- Lobby (準備畫面) -->
-                    <div id="quiz-lobby" class="flex-1 flex flex-col items-center justify-center p-6 md:p-8 text-center">
-                        <div class="text-6xl md:text-8xl mb-4 md:mb-6">🚀</div>
+                    <div id="quiz-lobby" class="flex-1 flex flex-col items-center justify-center p-6 md:p-8 text-center bounce-in">
+                        <div class="text-6xl md:text-8xl mb-4 md:mb-6 animate-bounce">🚀</div>
                         <h2 class="text-2xl md:text-4xl font-black text-slate-800 mb-3 md:mb-4">準備好接受挑戰了嗎？</h2>
                         <p class="text-base md:text-xl text-slate-600 mb-8 max-w-md">選擇下方的範圍，測試你對動詞三態的熟悉程度！</p>
                         
@@ -239,13 +266,12 @@
                             </div>
 
                             <div class="w-full space-y-4">
-                                <!-- inputmode="text" 幫助手機彈出正確鍵盤 -->
-                                <input type="text" id="answer-input" inputmode="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="請輸入答案..." class="w-full text-center text-xl md:text-3xl font-bold py-4 px-4 md:py-5 md:px-6 rounded-2xl border-4 border-slate-200 focus:border-purple-400 focus:ring-4 focus:ring-purple-100 outline-none transition-all placeholder:text-slate-300 bg-white shadow-inner text-slate-700 select-text">
+                                <input type="text" id="answer-input" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="請輸入答案..." class="w-full text-center text-xl md:text-3xl font-bold py-4 px-4 md:py-5 md:px-6 rounded-2xl border-4 border-slate-200 focus:border-purple-400 focus:ring-4 focus:ring-purple-100 outline-none transition-all placeholder:text-slate-300 bg-white shadow-inner text-slate-700">
                                 
                                 <!-- 按鈕區域 -->
                                 <div class="h-20 md:h-24 w-full relative flex gap-3">
                                     <button id="submit-btn" class="btn-3d w-full h-full bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-bold text-lg md:text-2xl rounded-2xl shadow-lg border-emerald-600 hover:brightness-110 active:scale-95 transition-all">
-                                        送出 (Enter)
+                                        送出答案 (Enter)
                                     </button>
                                     
                                     <div id="next-action-container" class="hidden-section w-full h-full flex gap-2 md:gap-3">
@@ -263,7 +289,8 @@
                                 </div>
                             </div>
 
-                            <div id="feedback-container" class="mt-4 h-12 md:h-16 flex items-center justify-center text-lg md:text-2xl font-bold transition-all opacity-0 px-2 text-center">
+                            <!-- 更新：移除原本寫死的高度限制，讓大卡片能自動撐開 -->
+                            <div id="feedback-container" class="mt-6 w-full transition-all opacity-0">
                                 <!-- Feedback -->
                             </div>
 
@@ -277,15 +304,6 @@
     </div>
 
     <script>
-        // 全域錯誤處理：如果手機報錯，會顯示在畫面上
-        window.onerror = function(message, source, lineno, colno, error) {
-            const errorLog = document.getElementById('error-log');
-            errorLog.style.display = 'block';
-            errorLog.textContent += `Error: ${message} at line ${lineno}\n`;
-            return false;
-        };
-
-        // 資料集
         const verbData = [
             {
                 title: "1. 規則動詞 (Regular)",
@@ -456,46 +474,76 @@
         const studyView = document.getElementById('study-view');
         const quizView = document.getElementById('quiz-view');
 
-        // Voice
+        // Voice and Audio
         let selectedVoice = null;
-        let voicesLoaded = false;
+        let audioCtx = null; // 新增：AudioContext 用於產生音效
 
-        // 安卓手機在第一次互動時，必須"解鎖"音頻環境
-        function unlockAudio() {
-            if (typeof SpeechSynthesisUtterance === "undefined") return;
-            const u = new SpeechSynthesisUtterance("");
-            speechSynthesis.speak(u);
-            document.removeEventListener('click', unlockAudio);
-            document.removeEventListener('touchstart', unlockAudio);
+        // 幫音效引擎做初始化 (解決瀏覽器阻擋自動播放的限制)
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
         }
-        document.addEventListener('click', unlockAudio);
-        document.addEventListener('touchstart', unlockAudio);
+
+        // 播放 Web Audio 產生的音效
+        function playSound(type) {
+            initAudio();
+            const oscillator = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            
+            if (type === 'correct') {
+                // 答對音效：清脆的上升高音
+                oscillator.type = 'sine';
+                oscillator.frequency.setValueAtTime(523.25, audioCtx.currentTime); // C5
+                oscillator.frequency.setValueAtTime(783.99, audioCtx.currentTime + 0.1); // G5
+                gainNode.gain.setValueAtTime(0.5, audioCtx.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+                oscillator.start(audioCtx.currentTime);
+                oscillator.stop(audioCtx.currentTime + 0.3);
+            } else {
+                // 答錯音效：低沉的震動聲
+                oscillator.type = 'sawtooth';
+                oscillator.frequency.setValueAtTime(150, audioCtx.currentTime); 
+                oscillator.frequency.exponentialRampToValueAtTime(80, audioCtx.currentTime + 0.3); 
+                gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+                oscillator.start(audioCtx.currentTime);
+                oscillator.stop(audioCtx.currentTime + 0.3);
+            }
+        }
 
         function loadVoices() {
-            if (voicesLoaded) return;
-            try {
-                const voices = speechSynthesis.getVoices();
-                if (voices.length === 0) return; 
-
-                selectedVoice = voices.find(voice => voice.name === 'Google US English' && voice.lang === 'en-US');
-                if (!selectedVoice) selectedVoice = voices.find(voice => voice.lang === 'en-US');
-                if (!selectedVoice) selectedVoice = voices.find(voice => voice.lang.startsWith('en'));
-                
-                voicesLoaded = true;
-            } catch (e) {
-                console.log("Voice load error, ignoring");
+            const voices = speechSynthesis.getVoices();
+            selectedVoice = voices.find(voice => voice.name === 'Google US English' && voice.lang === 'en-US');
+            
+            if (!selectedVoice) {
+                selectedVoice = voices.find(voice => 
+                    voice.lang === 'en-US' && 
+                    (voice.name.includes('Samantha') || voice.name.includes('Fred') || voice.name.includes('Daniel') || voice.name.includes('Karen'))
+                );
+            }
+            if (!selectedVoice) {
+                 selectedVoice = voices.find(voice => voice.lang === 'en-US');
+            }
+            if (!selectedVoice) {
+                selectedVoice = voices.find(voice => voice.lang.startsWith('en'));
             }
         }
 
         function speak(texts, iconElement = null) {
             if (!('speechSynthesis' in window)) return;
-            if (!voicesLoaded) loadVoices();
+            if (!selectedVoice || speechSynthesis.getVoices().length === 0) loadVoices();
 
             const wordsToSpeak = Array.isArray(texts) ? texts : [texts];
             if (wordsToSpeak.length === 0) return;
 
             speechSynthesis.cancel(); 
-            
             document.querySelectorAll('.speaker-icon.active').forEach(icon => {
                 icon.classList.remove('active');
             });
@@ -508,11 +556,10 @@
 
             function speakNext() {
                 if (currentIndex < wordsToSpeak.length) {
-                    const text = wordsToSpeak[currentIndex];
-                    const utterance = new SpeechSynthesisUtterance(text);
-                    utterance.lang = 'en-US'; 
+                    const utterance = new SpeechSynthesisUtterance(wordsToSpeak[currentIndex]);
+                    utterance.lang = 'en-US';
                     if (selectedVoice) utterance.voice = selectedVoice;
-                    utterance.pitch = 1; 
+                    utterance.pitch = 1.1; 
                     utterance.rate = 0.9; 
 
                     utterance.onend = () => {
@@ -536,7 +583,7 @@
 
         function createSpeakerIcon() {
             const icon = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-            icon.setAttribute("class", "speaker-icon h-7 w-7 md:h-6 md:w-6"); 
+            icon.setAttribute("class", "speaker-icon h-5 w-5 md:h-6 md:w-6");
             icon.setAttribute("fill", "none");
             icon.setAttribute("viewBox", "0 0 24 24");
             icon.setAttribute("stroke", "currentColor");
@@ -553,7 +600,7 @@
             
             if (!isHeader) {
                 const contentDiv = document.createElement('div');
-                contentDiv.className = 'table-cell-content flex items-center justify-center gap-1 md:gap-2 min-h-[44px]'; 
+                contentDiv.className = 'table-cell-content flex items-center justify-center gap-1 md:gap-2';
                 contentDiv.appendChild(document.createTextNode(text));
                 
                 if (/^[a-zA-Z\s/]+$/.test(text)) { 
@@ -579,8 +626,8 @@
 
             if (!isHeader) {
                 const button = document.createElement('button');
-                button.className = 'p-2 md:p-2 rounded-full bg-blue-100 hover:bg-blue-200 text-blue-600 transition-colors focus:outline-none active:bg-blue-300 touch-manipulation';
-                button.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 md:h-5 md:w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd" /></svg>';
+                button.className = 'p-1.5 md:p-2 rounded-full bg-blue-100 hover:bg-blue-200 text-blue-600 transition-colors focus:outline-none active:bg-blue-300';
+                button.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 md:h-5 md:w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd" /></svg>';
                 button.title = "播放整行";
                 button.addEventListener('click', (e) => {
                     e.stopPropagation();
@@ -594,15 +641,21 @@
             return cell;
         }
 
+        // New Helper for Column Highlighting
         function handleColumnClick(table, colIndex) {
+            // Find current selected header in this table
             const currentHeader = table.querySelector(`th:nth-child(${colIndex + 1})`);
             const isAlreadySelected = currentHeader.classList.contains('selected-col-header');
 
+            // Clear all column highlights in this table
             table.querySelectorAll('.selected-col').forEach(el => el.classList.remove('selected-col'));
             table.querySelectorAll('.selected-col-header').forEach(el => el.classList.remove('selected-col-header'));
 
+            // Toggle logic: if it wasn't selected, select it now
             if (!isAlreadySelected) {
+                // Highlight header
                 currentHeader.classList.add('selected-col-header');
+                // Highlight all cells in this column
                 const rows = table.querySelectorAll('tbody tr');
                 rows.forEach(row => {
                     const cell = row.children[colIndex];
@@ -612,77 +665,73 @@
         }
 
         function renderTables() {
-            try {
-                // 清空載入中提示
-                verbTablesContainer.innerHTML = '';
+            verbData.forEach(group => {
+                const section = document.createElement('section');
+                section.className = 'glass-panel rounded-3xl shadow-lg overflow-hidden transition-all hover:shadow-xl mb-6';
+                
+                const header = document.createElement('div');
+                header.className = 'bg-gradient-to-r from-blue-500/10 to-purple-500/10 p-4 md:p-5 border-b border-white/50';
+                const title = document.createElement('h2');
+                title.className = 'text-lg md:text-2xl font-bold text-slate-800 flex items-center gap-2';
+                title.innerHTML = `<span class="text-xl md:text-2xl">📌</span> ${group.title}`;
+                header.appendChild(title);
+                section.appendChild(header);
 
-                verbData.forEach(group => {
-                    const section = document.createElement('section');
-                    section.className = 'glass-panel rounded-3xl shadow-lg overflow-hidden transition-all hover:shadow-xl mb-6';
-                    
-                    const header = document.createElement('div');
-                    header.className = 'bg-gradient-to-r from-blue-500/10 to-purple-500/10 p-4 md:p-5 border-b border-white/50';
-                    const title = document.createElement('h2');
-                    title.className = 'text-lg md:text-2xl font-bold text-slate-800 flex items-center gap-2';
-                    title.innerHTML = `<span class="text-xl md:text-2xl">📌</span> ${group.title}`;
-                    header.appendChild(title);
-                    section.appendChild(header);
+                const tableContainer = document.createElement('div');
+                tableContainer.className = 'overflow-x-auto';
+                const table = document.createElement('table');
+                table.className = 'min-w-full';
 
-                    const tableContainer = document.createElement('div');
-                    tableContainer.className = 'overflow-x-auto';
-                    const table = document.createElement('table');
-                    table.className = 'min-w-full';
-
-                    const thead = document.createElement('thead');
-                    const headerRow = document.createElement('tr');
-                    
-                    const headers = ['全播', '原形', '過去式', '過去分詞', 'V-ing', '中文'];
-                    headers.forEach((text, index) => {
-                        const th = createTableCell(text, true);
-                        th.addEventListener('click', () => handleColumnClick(table, index));
-                        headerRow.appendChild(th);
-                    });
-                    
-                    thead.appendChild(headerRow);
-                    table.appendChild(thead);
-
-                    const tbody = document.createElement('tbody');
-                    tbody.className = 'bg-white';
-                    group.verbs.forEach(verb => {
-                        const row = document.createElement('tr');
-                        row.className = 'table-row-base cursor-pointer even:bg-slate-50';
-                        
-                        row.addEventListener('click', () => {
-                            const isSelected = row.classList.contains('selected-row');
-                            document.querySelectorAll('.selected-row').forEach(r => r.classList.remove('selected-row'));
-                            if (!isSelected) {
-                                row.classList.add('selected-row');
-                            }
-                        });
-
-                        row.appendChild(createPlayAllCell(verb));
-                        row.appendChild(createTableCell(verb.infinitive));
-                        row.appendChild(createTableCell(verb.pastSimple));
-                        row.appendChild(createTableCell(verb.pastParticiple));
-                        row.appendChild(createTableCell(verb.presentParticiple));
-                        row.appendChild(createTableCell(verb.translation));
-                        tbody.appendChild(row);
-                    });
-                    table.appendChild(tbody);
-                    tableContainer.appendChild(table);
-                    section.appendChild(tableContainer);
-                    verbTablesContainer.appendChild(section);
+                const thead = document.createElement('thead');
+                const headerRow = document.createElement('tr');
+                
+                const headers = ['全播', '原形', '過去式', '過去分詞', 'V-ing', '中文'];
+                headers.forEach((text, index) => {
+                    const th = createTableCell(text, true);
+                    // Add click event to header for column highlighting
+                    th.addEventListener('click', () => handleColumnClick(table, index));
+                    headerRow.appendChild(th);
                 });
-            } catch (err) {
-                alert("表格渲染失敗: " + err.message);
-            }
+                
+                thead.appendChild(headerRow);
+                table.appendChild(thead);
+
+                const tbody = document.createElement('tbody');
+                tbody.className = 'bg-white';
+                group.verbs.forEach(verb => {
+                    const row = document.createElement('tr');
+                    row.className = 'table-row-base cursor-pointer even:bg-slate-50';
+                    
+                    row.addEventListener('click', () => {
+                         const isSelected = row.classList.contains('selected-row');
+                         // Clear other row highlights in this table (or globally if preferred, currently global for simplicity)
+                         document.querySelectorAll('.selected-row').forEach(r => r.classList.remove('selected-row'));
+                         
+                         if (!isSelected) {
+                             row.classList.add('selected-row');
+                         }
+                    });
+
+                    row.appendChild(createPlayAllCell(verb));
+                    row.appendChild(createTableCell(verb.infinitive));
+                    row.appendChild(createTableCell(verb.pastSimple));
+                    row.appendChild(createTableCell(verb.pastParticiple));
+                    row.appendChild(createTableCell(verb.presentParticiple));
+                    row.appendChild(createTableCell(verb.translation));
+                    tbody.appendChild(row);
+                });
+                table.appendChild(tbody);
+                tableContainer.appendChild(table);
+                section.appendChild(tableContainer);
+                verbTablesContainer.appendChild(section);
+            });
         }
         
         function renderCategorySelector() {
             categorySelectorEl.innerHTML = '';
             verbData.forEach((group, index) => {
                 const container = document.createElement('label');
-                container.className = 'category-label flex items-center gap-3 p-3 bg-white rounded-xl border-2 border-slate-200 cursor-pointer transition-all hover:border-blue-400 active:scale-95 active'; 
+                container.className = 'flex items-center gap-3 p-3 bg-white rounded-xl border-2 border-slate-200 cursor-pointer transition-all hover:border-blue-400 has-[:checked]:border-blue-500 has-[:checked]:bg-blue-50 shadow-sm active:scale-95';
                 
                 const input = document.createElement('input');
                 input.type = 'checkbox';
@@ -690,14 +739,6 @@
                 input.value = index;
                 input.checked = true;
                 input.className = 'w-5 h-5 md:w-6 md:h-6 text-blue-600 rounded focus:ring-blue-500 border-gray-300 transition-all'; 
-                
-                input.addEventListener('change', (e) => {
-                    if (e.target.checked) {
-                        container.classList.add('active');
-                    } else {
-                        container.classList.remove('active');
-                    }
-                });
                 
                 const text = document.createElement('span');
                 text.className = 'text-slate-700 font-bold text-sm md:text-base select-none flex-1';
@@ -778,6 +819,8 @@
             
             speak(currentQuestion.answer.replace('/', ' or '));
             
+            // 重置輸入框樣式
+            answerInput.className = "w-full text-center text-xl md:text-3xl font-bold py-4 px-4 md:py-5 md:px-6 rounded-2xl border-4 border-slate-200 focus:border-purple-400 focus:ring-4 focus:ring-purple-100 outline-none transition-all placeholder:text-slate-300 bg-white shadow-inner text-slate-700";
             answerInput.value = '';
             answerInput.disabled = false;
             answerInput.focus();
@@ -786,8 +829,9 @@
             submitBtn.classList.remove('hidden-section');
             nextActionContainer.classList.add('hidden-section');
             
+            // 重置回饋區塊
             feedbackContainer.innerHTML = '';
-            feedbackContainer.className = 'mt-4 h-12 md:h-16 flex items-center justify-center text-lg md:text-2xl font-bold transition-all opacity-0 px-2 text-center';
+            feedbackContainer.className = 'mt-6 w-full transition-all opacity-0';
             
             isQuestionAnswered = false;
         }
@@ -801,35 +845,51 @@
             feedbackContainer.classList.remove('opacity-0');
 
             if (userAnswer === '') {
-                feedbackContainer.innerHTML = '<span class="text-amber-500 animate-pulse">⚡ 請輸入答案！</span>';
+                feedbackContainer.innerHTML = '<div class="text-amber-500 animate-pulse font-bold text-xl md:text-2xl text-center w-full">⚡ 請輸入答案！</div>';
                 return;
             }
 
             const answerSpeech = currentQuestion.answer.replace('/', ' or ');
 
+            // 移除輸入框預設樣式
+            answerInput.classList.remove('border-slate-200', 'bg-white', 'text-slate-700', 'focus:border-purple-400', 'focus:ring-purple-100');
+
             if (userAnswer === correctAnswer) {
+                // 答對：輸入框變綠色，顯示巨大提示卡
+                answerInput.classList.add('border-emerald-500', 'bg-emerald-50', 'text-emerald-700');
+                
                 feedbackContainer.innerHTML = `
-                    <div class="flex items-center gap-2 text-emerald-500 bounce-in justify-center">
-                        <span class="text-2xl md:text-3xl">🎉</span> 
-                        <span>Correct! ${currentQuestion.answer}</span>
+                    <div class="w-full bg-emerald-100 border-4 border-emerald-400 text-emerald-800 px-4 py-4 md:py-6 rounded-2xl shadow-lg bounce-in flex flex-col md:flex-row items-center justify-center gap-3 md:gap-6">
+                        <span class="text-5xl md:text-6xl drop-shadow-md">🎉</span> 
+                        <div class="text-center md:text-left">
+                            <div class="text-sm md:text-lg font-black opacity-70 uppercase tracking-widest mb-1">答對了！</div>
+                            <div class="text-3xl md:text-5xl font-black">${currentQuestion.answer}</div>
+                        </div>
                     </div>`;
                 score += 10;
                 streak++;
-                speak(['Correct', answerSpeech]);
+                playSound('correct');  // 播放成功音效
+                speak(answerSpeech);   // 只唸出單字
             } else {
+                // 答錯：輸入框變紅色並震動，顯示巨大提示卡
+                answerInput.classList.add('border-rose-500', 'bg-rose-50', 'text-rose-700', 'shake');
+                
                 feedbackContainer.innerHTML = `
-                    <div class="flex items-center gap-2 text-rose-500 bounce-in justify-center">
-                        <span class="text-2xl md:text-3xl">💥</span>
-                        <span>Wrong. It's ${currentQuestion.answer}</span>
+                    <div class="w-full bg-rose-100 border-4 border-rose-400 text-rose-800 px-4 py-4 md:py-6 rounded-2xl shadow-lg bounce-in flex flex-col md:flex-row items-center justify-center gap-3 md:gap-6">
+                        <span class="text-5xl md:text-6xl drop-shadow-md">💥</span>
+                        <div class="text-center md:text-left">
+                            <div class="text-sm md:text-lg font-black opacity-70 uppercase tracking-widest mb-1">答錯了，正解為：</div>
+                            <div class="text-3xl md:text-5xl font-black">${currentQuestion.answer}</div>
+                        </div>
                     </div>`;
                 streak = 0;
-                speak(['Incorrect', answerSpeech]);
+                playSound('wrong');   // 播放失敗音效
+                speak(answerSpeech);  // 只唸出單字
             }
             
             updateScoreboard();
             
             answerInput.disabled = true;
-            answerInput.parentElement.classList.add('opacity-50'); 
             
             submitBtn.classList.add('hidden-section');
             nextActionContainer.classList.remove('hidden-section');
@@ -878,23 +938,21 @@
             }
         });
         
+        document.body.addEventListener('click', () => {
+             if (speechSynthesis.getVoices().length === 0) loadVoices();
+             initAudio(); // 初始化音效引擎
+        }, { once: true });
+
+        loadVoices();
         if (speechSynthesis.onvoiceschanged !== undefined) {
             speechSynthesis.onvoiceschanged = loadVoices;
         }
-        
-        // 使用 window.onload 確保手機完全載入後才執行，避免卡空白
-        window.addEventListener('load', () => {
-            try {
-                renderTables();
-                renderCategorySelector();
-                updateScoreboard();
-                switchTab('study');
-                setTimeout(loadVoices, 1000); // 延後載入語音
-            } catch(e) {
-                alert("初始化失敗：" + e.message);
-            }
-        });
 
+        renderTables();
+        renderCategorySelector();
+        updateScoreboard();
+        
+        switchTab('study');
     </script>
 </body>
 </html>
