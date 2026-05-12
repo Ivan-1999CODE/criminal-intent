@@ -218,15 +218,45 @@
                         <h2 class="text-2xl md:text-4xl font-black text-slate-800 mb-3 md:mb-4">準備好接受挑戰了嗎？</h2>
                         <p class="text-base md:text-xl text-slate-600 mb-8 max-w-md">選擇下方的範圍，測試你對動詞三態的熟悉程度！</p>
                         
-                        <div class="mb-8 bg-white/60 p-5 rounded-2xl border border-white shadow-inner w-full max-w-2xl">
-                            <h3 class="text-base md:text-lg font-bold text-slate-700 mb-4 flex items-center justify-center gap-2">
-                                <span class="w-2 h-2 rounded-full bg-blue-500"></span>
-                                請勾選測驗範圍
-                                <span class="w-2 h-2 rounded-full bg-blue-500"></span>
-                            </h3>
-                            <!-- 範圍選擇器容器 -->
-                            <div id="category-selector" class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-left">
-                                <!-- JS Generated Checkboxes -->
+                        <div class="flex flex-col md:flex-row gap-4 mb-8 w-full max-w-4xl justify-center">
+                            <!-- 範圍選擇器 -->
+                            <div class="bg-white/60 p-5 rounded-2xl border border-white shadow-inner flex-1">
+                                <h3 class="text-base md:text-lg font-bold text-slate-700 mb-4 flex items-center justify-center gap-2">
+                                    <span class="w-2 h-2 rounded-full bg-blue-500"></span>
+                                    請勾選測驗範圍
+                                    <span class="w-2 h-2 rounded-full bg-blue-500"></span>
+                                </h3>
+                                <!-- 範圍選擇器容器 -->
+                                <div id="category-selector" class="grid grid-cols-1 gap-3 text-left">
+                                    <!-- JS Generated Checkboxes -->
+                                </div>
+                            </div>
+
+                            <!-- 題型選擇器 -->
+                            <div class="bg-white/60 p-5 rounded-2xl border border-white shadow-inner flex-1">
+                                <h3 class="text-base md:text-lg font-bold text-slate-700 mb-4 flex items-center justify-center gap-2">
+                                    <span class="w-2 h-2 rounded-full bg-purple-500"></span>
+                                    請勾選測驗題型
+                                    <span class="w-2 h-2 rounded-full bg-purple-500"></span>
+                                </h3>
+                                <div id="form-selector" class="grid grid-cols-1 gap-3 text-left">
+                                    <label class="flex items-center gap-3 p-3 bg-white rounded-xl border-2 border-slate-200 cursor-pointer transition-all hover:border-purple-400 has-[:checked]:border-purple-500 has-[:checked]:bg-purple-50 shadow-sm active:scale-95">
+                                        <input type="checkbox" value="infinitive" checked class="w-5 h-5 md:w-6 md:h-6 text-purple-600 rounded focus:ring-purple-500 border-gray-300 transition-all">
+                                        <span class="text-slate-700 font-bold text-sm md:text-base select-none flex-1">現在式</span>
+                                    </label>
+                                    <label class="flex items-center gap-3 p-3 bg-white rounded-xl border-2 border-slate-200 cursor-pointer transition-all hover:border-purple-400 has-[:checked]:border-purple-500 has-[:checked]:bg-purple-50 shadow-sm active:scale-95">
+                                        <input type="checkbox" value="pastSimple" checked class="w-5 h-5 md:w-6 md:h-6 text-purple-600 rounded focus:ring-purple-500 border-gray-300 transition-all">
+                                        <span class="text-slate-700 font-bold text-sm md:text-base select-none flex-1">過去式</span>
+                                    </label>
+                                    <label class="flex items-center gap-3 p-3 bg-white rounded-xl border-2 border-slate-200 cursor-pointer transition-all hover:border-purple-400 has-[:checked]:border-purple-500 has-[:checked]:bg-purple-50 shadow-sm active:scale-95">
+                                        <input type="checkbox" value="pastParticiple" checked class="w-5 h-5 md:w-6 md:h-6 text-purple-600 rounded focus:ring-purple-500 border-gray-300 transition-all">
+                                        <span class="text-slate-700 font-bold text-sm md:text-base select-none flex-1">VPP</span>
+                                    </label>
+                                    <label class="flex items-center gap-3 p-3 bg-white rounded-xl border-2 border-slate-200 cursor-pointer transition-all hover:border-purple-400 has-[:checked]:border-purple-500 has-[:checked]:bg-purple-50 shadow-sm active:scale-95">
+                                        <input type="checkbox" value="presentParticiple" checked class="w-5 h-5 md:w-6 md:h-6 text-purple-600 rounded focus:ring-purple-500 border-gray-300 transition-all">
+                                        <span class="text-slate-700 font-bold text-sm md:text-base select-none flex-1">V-ing</span>
+                                    </label>
+                                </div>
                             </div>
                         </div>
 
@@ -760,8 +790,13 @@
 
         function startGame() {
             const selectedCategories = Array.from(document.querySelectorAll('#category-selector input:checked'));
+            const selectedForms = Array.from(document.querySelectorAll('#form-selector input:checked'));
             if (selectedCategories.length === 0) {
                 alert("請至少選擇一個範圍喔！😅");
+                return;
+            }
+            if (selectedForms.length === 0) {
+                alert("請至少選擇一種題型喔！😅");
                 return;
             }
             quizLobby.classList.add('hidden-section');
@@ -779,24 +814,28 @@
 
         function generateQuestion() {
             const selectedCategories = Array.from(document.querySelectorAll('#category-selector input:checked')).map(input => parseInt(input.value));
+            const selectedForms = Array.from(document.querySelectorAll('#form-selector input:checked')).map(input => input.value);
+            
             const quizPool = verbData
                 .filter((group, index) => selectedCategories.includes(index))
                 .flatMap(group => group.verbs);
 
-            if (quizPool.length === 0) return;
+            if (quizPool.length === 0 || selectedForms.length === 0) return;
 
             const randomVerb = quizPool[Math.floor(Math.random() * quizPool.length)];
-            const types = ['pastSimple', 'pastParticiple', 'presentParticiple'];
-            const questionType = types[Math.floor(Math.random() * types.length)];
+            const questionType = selectedForms[Math.floor(Math.random() * selectedForms.length)];
             
             let typeText = '';
             let typeColorClass = '';
             
-            if (questionType === 'pastSimple') {
+            if (questionType === 'infinitive') {
+                typeText = '現在式';
+                typeColorClass = 'text-blue-300';
+            } else if (questionType === 'pastSimple') {
                 typeText = '過去式';
                 typeColorClass = 'text-yellow-300';
             } else if (questionType === 'pastParticiple') {
-                typeText = '過去分詞';
+                typeText = 'VPP';
                 typeColorClass = 'text-green-300';
             } else {
                 typeText = 'V-ing';
@@ -808,10 +847,17 @@
                 type: questionType,
                 answer: randomVerb[questionType]
             };
+            
+            let promptWord = '';
+            if (questionType === 'infinitive') {
+                promptWord = `${randomVerb.translation} (${randomVerb.pastSimple})`;
+            } else {
+                promptWord = `${randomVerb.infinitive} (${randomVerb.translation})`;
+            }
 
             questionText.innerHTML = `
                 <div class="text-xs md:text-sm uppercase tracking-widest opacity-70 mb-2">Quiz Time</div>
-                <span class="text-4xl md:text-6xl font-black block mb-4 filter drop-shadow-lg">${randomVerb.infinitive}</span>
+                <span class="text-4xl md:text-6xl font-black block mb-4 filter drop-shadow-lg">${promptWord}</span>
                 <div class="text-lg md:text-xl font-medium opacity-90">
                     請輸入 <span class="${typeColorClass} font-bold underline decoration-wavy underline-offset-4">${typeText}</span>
                 </div>
