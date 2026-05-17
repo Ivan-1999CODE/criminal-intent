@@ -33,11 +33,21 @@
         }
     </script>
     <style>
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            width: 100%;
+            max-width: 100%;
+            overflow-x: hidden;
+        }
+
         body {
             background: linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%);
             min-height: 100vh;
             -webkit-overflow-scrolling: touch;
-            overflow-x: hidden;
         }
 
         .btn-3d {
@@ -71,6 +81,28 @@
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.5);
+            max-width: 100%;
+        }
+
+        .table-scroll {
+            width: 100%;
+            max-width: 100%;
+            overflow-x: auto;
+            overflow-y: hidden;
+            -webkit-overflow-scrolling: touch;
+            overscroll-behavior-x: contain;
+        }
+
+        .verb-table {
+            width: max-content;
+            min-width: 680px;
+        }
+
+        @media (min-width: 768px) {
+            .verb-table {
+                width: 100%;
+                min-width: 100%;
+            }
         }
 
         /* --- 表格樣式優化 --- */
@@ -174,7 +206,7 @@
     <div class="blob blob-2"></div>
     <div class="blob blob-3"></div>
 
-    <div class="container mx-auto px-3 py-6 md:px-4 md:py-8 max-w-6xl relative z-10">
+    <div class="container mx-auto w-full max-w-6xl px-3 py-6 md:px-4 md:py-8 relative z-10">
         
         <header class="text-center mb-8 fade-in-up">
             <h1 class="text-3xl md:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600 tracking-tight font-display drop-shadow-sm mb-3 md:mb-4">
@@ -199,7 +231,7 @@
 
         <!-- 學習區塊 -->
         <div id="study-view" class="fade-in-up pb-10" style="animation-delay: 0.2s;">
-            <main id="verb-tables" class="space-y-8 md:space-y-10">
+            <main id="verb-tables" class="w-full max-w-full min-w-0 space-y-8 md:space-y-10">
                 <!-- JS Generated -->
             </main>
         </div>
@@ -697,7 +729,7 @@
         function renderTables() {
             verbData.forEach(group => {
                 const section = document.createElement('section');
-                section.className = 'glass-panel rounded-3xl shadow-lg overflow-hidden transition-all hover:shadow-xl mb-6';
+                section.className = 'glass-panel w-full max-w-full rounded-3xl shadow-lg overflow-hidden transition-all hover:shadow-xl mb-6';
                 
                 const header = document.createElement('div');
                 header.className = 'bg-gradient-to-r from-blue-500/10 to-purple-500/10 p-4 md:p-5 border-b border-white/50';
@@ -708,9 +740,9 @@
                 section.appendChild(header);
 
                 const tableContainer = document.createElement('div');
-                tableContainer.className = 'overflow-x-auto';
+                tableContainer.className = 'table-scroll';
                 const table = document.createElement('table');
-                table.className = 'min-w-full';
+                table.className = 'verb-table';
 
                 const thead = document.createElement('thead');
                 const headerRow = document.createElement('tr');
