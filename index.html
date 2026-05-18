@@ -105,98 +105,6 @@
             }
         }
 
-        @media (max-width: 640px) {
-            .table-scroll {
-                overflow-x: visible;
-            }
-
-            .verb-table {
-                width: 100%;
-                min-width: 100%;
-                border-collapse: separate;
-                border-spacing: 0;
-            }
-
-            .verb-table thead {
-                display: none;
-            }
-
-            .verb-table tbody {
-                display: block;
-                padding: 0.75rem;
-                background: #f8fafc;
-            }
-
-            .verb-table tr {
-                display: grid;
-                grid-template-columns: 44px repeat(2, minmax(0, 1fr));
-                margin-bottom: 0.75rem;
-                overflow: hidden;
-                border: 1px solid #e2e8f0;
-                border-radius: 16px;
-                background: #fff;
-                box-shadow: 0 1px 2px rgba(15, 23, 42, 0.06);
-            }
-
-            .verb-table tr:last-child {
-                margin-bottom: 0;
-            }
-
-            .verb-table td {
-                display: flex;
-                min-width: 0;
-                align-items: center;
-                justify-content: center;
-                border: 0;
-                padding: 0.55rem 0.35rem;
-                text-align: center;
-            }
-
-            .verb-table td:nth-child(1) {
-                grid-row: 1 / span 3;
-                background: #eff6ff;
-            }
-
-            .verb-table td:nth-child(4),
-            .verb-table td:nth-child(5),
-            .verb-table td:nth-child(6) {
-                border-top: 1px solid #f1f5f9;
-            }
-
-            .verb-table td:nth-child(6) {
-                grid-column: 2 / span 2;
-            }
-
-            .verb-table td:not(:first-child)::before {
-                content: attr(data-label);
-                display: block;
-                margin-bottom: 0.15rem;
-                font-size: 0.65rem;
-                font-weight: 700;
-                line-height: 1;
-                color: #94a3b8;
-            }
-
-            .verb-table .table-cell-content {
-                width: 100%;
-                min-width: 0;
-                flex-wrap: wrap;
-                gap: 0.1rem 0.25rem;
-                font-size: 0.95rem;
-                line-height: 1.15;
-            }
-
-            .verb-table .speaker-icon {
-                width: 1rem;
-                height: 1rem;
-                flex: 0 0 auto;
-            }
-
-            .selected-row {
-                transform: none;
-            }
-        }
-
         /* --- 表格樣式優化 --- */
         .table-row-base {
             transition: all 0.2s;
@@ -866,18 +774,12 @@
                          }
                     });
 
-                    const cells = [
-                        createPlayAllCell(verb),
-                        createTableCell(verb.infinitive),
-                        createTableCell(verb.pastSimple),
-                        createTableCell(verb.pastParticiple),
-                        createTableCell(verb.presentParticiple),
-                        createTableCell(verb.translation)
-                    ];
-                    cells.forEach((cell, index) => {
-                        cell.dataset.label = headers[index];
-                        row.appendChild(cell);
-                    });
+                    row.appendChild(createPlayAllCell(verb));
+                    row.appendChild(createTableCell(verb.infinitive));
+                    row.appendChild(createTableCell(verb.pastSimple));
+                    row.appendChild(createTableCell(verb.pastParticiple));
+                    row.appendChild(createTableCell(verb.presentParticiple));
+                    row.appendChild(createTableCell(verb.translation));
                     tbody.appendChild(row);
                 });
                 table.appendChild(tbody);
