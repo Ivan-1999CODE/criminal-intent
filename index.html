@@ -238,7 +238,7 @@
 
         <!-- 測驗區塊 -->
         <div id="quiz-view" class="hidden-section fade-in-up pb-10">
-            <section class="max-w-4xl mx-auto">
+            <section class="max-w-6xl mx-auto">
                 
                 <div class="glass-panel rounded-3xl shadow-2xl overflow-hidden min-h-[500px] flex flex-col relative">
                     
@@ -317,8 +317,9 @@
                             </div>
                         </div>
 
+                        <div class="grid flex-1 grid-cols-1 lg:grid-cols-[minmax(0,1fr)_320px] gap-4 md:gap-6 items-start">
                         <!-- Question Area -->
-                        <div class="flex-1 flex flex-col items-center justify-start md:justify-center max-w-3xl mx-auto w-full">
+                        <div class="flex flex-col items-center justify-start md:justify-center w-full min-w-0">
                             
                             <div class="w-full bg-gradient-to-br from-indigo-600 to-purple-700 text-white rounded-2xl p-6 md:p-12 shadow-xl mb-6 text-center relative overflow-hidden group">
                                 <div class="absolute top-0 right-0 p-4 opacity-10 text-6xl md:text-9xl font-display select-none pointer-events-none">?</div>
@@ -356,6 +357,37 @@
                                 <!-- Feedback -->
                             </div>
 
+                        </div>
+
+                        <aside class="w-full lg:sticky lg:top-6 bg-white/90 border border-slate-200 rounded-2xl shadow-sm p-4">
+                            <div class="flex items-center justify-between gap-3 mb-4">
+                                <h3 class="text-lg font-black text-slate-800">作答紀錄</h3>
+                                <div class="flex items-center gap-2 text-xs font-bold">
+                                    <span class="px-2 py-1 rounded-full bg-emerald-100 text-emerald-700">對 <span id="correct-count">0</span></span>
+                                    <span class="px-2 py-1 rounded-full bg-rose-100 text-rose-700">錯 <span id="wrong-count">0</span></span>
+                                </div>
+                            </div>
+
+                            <div class="space-y-5">
+                                <section>
+                                    <div class="flex items-center gap-2 mb-2">
+                                        <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+                                        <h4 class="text-sm font-black text-emerald-700">答對</h4>
+                                    </div>
+                                    <ul id="correct-list" class="space-y-2 max-h-56 overflow-y-auto pr-1"></ul>
+                                    <p id="correct-empty" class="text-sm text-slate-400 bg-slate-50 rounded-xl p-3">還沒有答對的題目</p>
+                                </section>
+
+                                <section>
+                                    <div class="flex items-center gap-2 mb-2">
+                                        <span class="w-2.5 h-2.5 rounded-full bg-rose-500"></span>
+                                        <h4 class="text-sm font-black text-rose-700">答錯</h4>
+                                    </div>
+                                    <ul id="wrong-list" class="space-y-2 max-h-56 overflow-y-auto pr-1"></ul>
+                                    <p id="wrong-empty" class="text-sm text-slate-400 bg-slate-50 rounded-xl p-3">還沒有答錯的題目</p>
+                                </section>
+                            </div>
+                        </aside>
                         </div>
                     </div>
 
@@ -509,6 +541,8 @@
         let currentQuestion = null;
         let score = 0;
         let streak = 0;
+        let correctAnswers = [];
+        let wrongAnswers = [];
         let isQuestionAnswered = false;
         
         // DOM Elements
@@ -524,6 +558,12 @@
         const scoreEl = document.getElementById('score');
         const streakEl = document.getElementById('streak');
         const categorySelectorEl = document.getElementById('category-selector');
+        const correctListEl = document.getElementById('correct-list');
+        const wrongListEl = document.getElementById('wrong-list');
+        const correctCountEl = document.getElementById('correct-count');
+        const wrongCountEl = document.getElementById('wrong-count');
+        const correctEmptyEl = document.getElementById('correct-empty');
+        const wrongEmptyEl = document.getElementById('wrong-empty');
         
         const quizLobby = document.getElementById('quiz-lobby');
         const quizInterface = document.getElementById('quiz-interface');
@@ -820,6 +860,75 @@
             setTimeout(() => scoreEl.parentElement.classList.remove('scale-110'), 150);
         }
 
+        const formLabels = {
+            infinitive: '原形',
+            pastSimple: '過去式',
+            pastParticiple: '過去分詞',
+            presentParticiple: '現在分詞'
+        };
+
+        function escapeHTML(value) {
+            return String(value)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
+        function getQuestionPrompt(question) {
+            if (question.type === 'infinitive') {
+                return `${question.verb.translation} (${question.verb.pastSimple})`;
+            }
+            return `${question.verb.infinitive} (${question.verb.translation})`;
+        }
+
+        function createHistoryItem(entry, isCorrect) {
+            const colorClass = isCorrect
+                ? 'border-emerald-100 bg-emerald-50/70 text-emerald-800'
+                : 'border-rose-100 bg-rose-50/70 text-rose-800';
+            const answerLine = isCorrect
+                ? ''
+                : `<div class="mt-1 text-xs text-rose-600">你的答案：${escapeHTML(entry.userAnswer || '未輸入')}</div>`;
+
+            return `
+                <li class="rounded-xl border ${colorClass} p-3">
+                    <div class="flex items-start justify-between gap-2">
+                        <span class="font-black leading-tight">${escapeHTML(entry.correctAnswer)}</span>
+                        <span class="shrink-0 rounded-full bg-white/80 px-2 py-0.5 text-[11px] font-bold">${escapeHTML(entry.typeLabel)}</span>
+                    </div>
+                    <div class="mt-1 text-xs opacity-80">題目：${escapeHTML(entry.prompt)}</div>
+                    ${answerLine}
+                </li>
+            `;
+        }
+
+        function renderAnswerHistory() {
+            correctCountEl.textContent = correctAnswers.length;
+            wrongCountEl.textContent = wrongAnswers.length;
+            correctListEl.innerHTML = correctAnswers.map(entry => createHistoryItem(entry, true)).join('');
+            wrongListEl.innerHTML = wrongAnswers.map(entry => createHistoryItem(entry, false)).join('');
+            correctEmptyEl.classList.toggle('hidden-section', correctAnswers.length > 0);
+            wrongEmptyEl.classList.toggle('hidden-section', wrongAnswers.length > 0);
+        }
+
+        function recordAnswer(isCorrect, userAnswer) {
+            const entry = {
+                prompt: getQuestionPrompt(currentQuestion),
+                typeLabel: formLabels[currentQuestion.type] || currentQuestion.type,
+                correctAnswer: currentQuestion.answer,
+                userAnswer
+            };
+
+            if (isCorrect) {
+                correctAnswers.unshift(entry);
+            } else {
+                wrongAnswers.unshift(entry);
+            }
+
+            renderAnswerHistory();
+        }
+
         function startGame() {
             const selectedCategories = Array.from(document.querySelectorAll('#category-selector input:checked'));
             const selectedForms = Array.from(document.querySelectorAll('#form-selector input:checked'));
@@ -835,7 +944,10 @@
             quizInterface.classList.remove('hidden-section');
             score = 0;
             streak = 0;
+            correctAnswers = [];
+            wrongAnswers = [];
             updateScoreboard();
+            renderAnswerHistory();
             generateQuestion();
         }
 
@@ -916,6 +1028,7 @@
 
         function checkAnswer() {
             if (!currentQuestion) return;
+            if (isQuestionAnswered) return;
 
             const userAnswer = answerInput.value.trim().toLowerCase();
             const correctAnswer = currentQuestion.answer.toLowerCase();
@@ -946,6 +1059,7 @@
                     </div>`;
                 score += 10;
                 streak++;
+                recordAnswer(true, userAnswer);
                 playSound('correct');  // 播放成功音效
                 speak(answerSpeech);   // 只唸出單字
             } else {
@@ -961,6 +1075,7 @@
                         </div>
                     </div>`;
                 streak = 0;
+                recordAnswer(false, userAnswer);
                 playSound('wrong');   // 播放失敗音效
                 speak(answerSpeech);  // 只唸出單字
             }
