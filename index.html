@@ -2,7 +2,7 @@
 <html lang="zh-Hant">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>動詞三態互動學習網</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
@@ -47,7 +47,14 @@
         body {
             background: linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%);
             min-height: 100vh;
+            min-height: 100dvh;
             -webkit-overflow-scrolling: touch;
+        }
+
+        button,
+        label,
+        input {
+            touch-action: manipulation;
         }
 
         .btn-3d {
@@ -198,6 +205,85 @@
             -webkit-appearance: none;
             border-radius: 1rem;
         }
+
+        .quiz-choice {
+            min-height: 48px;
+        }
+
+        .quiz-choice input[type="checkbox"] {
+            -webkit-appearance: auto;
+            appearance: auto;
+            accent-color: #3b82f6;
+            flex: 0 0 auto;
+            opacity: 1;
+        }
+
+        .quiz-choice.is-selected {
+            border-color: #3b82f6;
+            background: #eff6ff;
+        }
+
+        #form-selector .quiz-choice.is-selected {
+            border-color: #a855f7;
+            background: #faf5ff;
+        }
+
+        @media (max-width: 767px) {
+            .glass-panel {
+                border-radius: 1.25rem;
+            }
+
+            #quiz-view .glass-panel {
+                min-height: auto;
+                overflow: visible;
+            }
+
+            #quiz-lobby {
+                align-items: stretch;
+                justify-content: flex-start;
+                min-height: auto;
+                padding: 1rem;
+            }
+
+            #quiz-lobby > .text-6xl {
+                display: none;
+            }
+
+            .quiz-options-grid {
+                display: flex;
+                flex-direction: column;
+                gap: 0.875rem;
+                margin-bottom: 1rem;
+            }
+
+            .quiz-option-card {
+                padding: 1rem;
+            }
+
+            #category-selector,
+            #form-selector {
+                display: grid;
+                grid-template-columns: 1fr;
+                gap: 0.75rem;
+            }
+
+            .quiz-choice {
+                width: 100%;
+                padding: 0.875rem;
+                border-radius: 0.875rem;
+            }
+
+            .quiz-choice input[type="checkbox"] {
+                width: 1.5rem;
+                height: 1.5rem;
+            }
+
+            #start-game-btn {
+                position: sticky;
+                bottom: max(0.75rem, env(safe-area-inset-bottom));
+                z-index: 30;
+            }
+        }
     </style>
 </head>
 <body class="text-slate-700 antialiased selection:bg-purple-200 selection:text-purple-900">
@@ -250,9 +336,9 @@
                         <h2 class="text-2xl md:text-4xl font-black text-slate-800 mb-3 md:mb-4">準備好接受挑戰了嗎？</h2>
                         <p class="text-base md:text-xl text-slate-600 mb-8 max-w-md">選擇下方的範圍，測試你對動詞三態的熟悉程度！</p>
                         
-                        <div class="flex flex-col md:flex-row gap-4 mb-8 w-full max-w-4xl justify-center">
+                        <div class="quiz-options-grid flex flex-col md:flex-row gap-4 mb-8 w-full max-w-4xl justify-center">
                             <!-- 範圍選擇器 -->
-                            <div class="bg-white/60 p-5 rounded-2xl border border-white shadow-inner flex-1">
+                            <div class="quiz-option-card bg-white/60 p-5 rounded-2xl border border-white shadow-inner flex-1">
                                 <h3 class="text-base md:text-lg font-bold text-slate-700 mb-4 flex items-center justify-center gap-2">
                                     <span class="w-2 h-2 rounded-full bg-blue-500"></span>
                                     請勾選測驗範圍
@@ -265,27 +351,27 @@
                             </div>
 
                             <!-- 題型選擇器 -->
-                            <div class="bg-white/60 p-5 rounded-2xl border border-white shadow-inner flex-1">
+                            <div class="quiz-option-card bg-white/60 p-5 rounded-2xl border border-white shadow-inner flex-1">
                                 <h3 class="text-base md:text-lg font-bold text-slate-700 mb-4 flex items-center justify-center gap-2">
                                     <span class="w-2 h-2 rounded-full bg-purple-500"></span>
                                     請勾選測驗題型
                                     <span class="w-2 h-2 rounded-full bg-purple-500"></span>
                                 </h3>
                                 <div id="form-selector" class="grid grid-cols-1 gap-3 text-left">
-                                    <label class="flex items-center gap-3 p-3 bg-white rounded-xl border-2 border-slate-200 cursor-pointer transition-all hover:border-purple-400 has-[:checked]:border-purple-500 has-[:checked]:bg-purple-50 shadow-sm active:scale-95">
-                                        <input type="checkbox" value="infinitive" checked class="w-5 h-5 md:w-6 md:h-6 text-purple-600 rounded focus:ring-purple-500 border-gray-300 transition-all">
+                                    <label class="quiz-choice flex items-center gap-3 p-3 bg-white rounded-xl border-2 border-slate-200 cursor-pointer transition-all hover:border-purple-400 has-[:checked]:border-purple-500 has-[:checked]:bg-purple-50 shadow-sm active:scale-95">
+                                        <input type="checkbox" value="infinitive" checked class="quiz-checkbox w-5 h-5 md:w-6 md:h-6 text-purple-600 rounded focus:ring-purple-500 border-gray-300 transition-all">
                                         <span class="text-slate-700 font-bold text-sm md:text-base select-none flex-1">現在式</span>
                                     </label>
-                                    <label class="flex items-center gap-3 p-3 bg-white rounded-xl border-2 border-slate-200 cursor-pointer transition-all hover:border-purple-400 has-[:checked]:border-purple-500 has-[:checked]:bg-purple-50 shadow-sm active:scale-95">
-                                        <input type="checkbox" value="pastSimple" checked class="w-5 h-5 md:w-6 md:h-6 text-purple-600 rounded focus:ring-purple-500 border-gray-300 transition-all">
+                                    <label class="quiz-choice flex items-center gap-3 p-3 bg-white rounded-xl border-2 border-slate-200 cursor-pointer transition-all hover:border-purple-400 has-[:checked]:border-purple-500 has-[:checked]:bg-purple-50 shadow-sm active:scale-95">
+                                        <input type="checkbox" value="pastSimple" checked class="quiz-checkbox w-5 h-5 md:w-6 md:h-6 text-purple-600 rounded focus:ring-purple-500 border-gray-300 transition-all">
                                         <span class="text-slate-700 font-bold text-sm md:text-base select-none flex-1">過去式</span>
                                     </label>
-                                    <label class="flex items-center gap-3 p-3 bg-white rounded-xl border-2 border-slate-200 cursor-pointer transition-all hover:border-purple-400 has-[:checked]:border-purple-500 has-[:checked]:bg-purple-50 shadow-sm active:scale-95">
-                                        <input type="checkbox" value="pastParticiple" checked class="w-5 h-5 md:w-6 md:h-6 text-purple-600 rounded focus:ring-purple-500 border-gray-300 transition-all">
+                                    <label class="quiz-choice flex items-center gap-3 p-3 bg-white rounded-xl border-2 border-slate-200 cursor-pointer transition-all hover:border-purple-400 has-[:checked]:border-purple-500 has-[:checked]:bg-purple-50 shadow-sm active:scale-95">
+                                        <input type="checkbox" value="pastParticiple" checked class="quiz-checkbox w-5 h-5 md:w-6 md:h-6 text-purple-600 rounded focus:ring-purple-500 border-gray-300 transition-all">
                                         <span class="text-slate-700 font-bold text-sm md:text-base select-none flex-1">VPP</span>
                                     </label>
-                                    <label class="flex items-center gap-3 p-3 bg-white rounded-xl border-2 border-slate-200 cursor-pointer transition-all hover:border-purple-400 has-[:checked]:border-purple-500 has-[:checked]:bg-purple-50 shadow-sm active:scale-95">
-                                        <input type="checkbox" value="presentParticiple" checked class="w-5 h-5 md:w-6 md:h-6 text-purple-600 rounded focus:ring-purple-500 border-gray-300 transition-all">
+                                    <label class="quiz-choice flex items-center gap-3 p-3 bg-white rounded-xl border-2 border-slate-200 cursor-pointer transition-all hover:border-purple-400 has-[:checked]:border-purple-500 has-[:checked]:bg-purple-50 shadow-sm active:scale-95">
+                                        <input type="checkbox" value="presentParticiple" checked class="quiz-checkbox w-5 h-5 md:w-6 md:h-6 text-purple-600 rounded focus:ring-purple-500 border-gray-300 transition-all">
                                         <span class="text-slate-700 font-bold text-sm md:text-base select-none flex-1">V-ing</span>
                                     </label>
                                 </div>
@@ -833,14 +919,14 @@
             categorySelectorEl.innerHTML = '';
             verbData.forEach((group, index) => {
                 const container = document.createElement('label');
-                container.className = 'flex items-center gap-3 p-3 bg-white rounded-xl border-2 border-slate-200 cursor-pointer transition-all hover:border-blue-400 has-[:checked]:border-blue-500 has-[:checked]:bg-blue-50 shadow-sm active:scale-95';
+                container.className = 'quiz-choice flex items-center gap-3 p-3 bg-white rounded-xl border-2 border-slate-200 cursor-pointer transition-all hover:border-blue-400 has-[:checked]:border-blue-500 has-[:checked]:bg-blue-50 shadow-sm active:scale-95';
                 
                 const input = document.createElement('input');
                 input.type = 'checkbox';
                 input.id = `category-${index}`;
                 input.value = index;
                 input.checked = true;
-                input.className = 'w-5 h-5 md:w-6 md:h-6 text-blue-600 rounded focus:ring-blue-500 border-gray-300 transition-all'; 
+                input.className = 'quiz-checkbox w-5 h-5 md:w-6 md:h-6 text-blue-600 rounded focus:ring-blue-500 border-gray-300 transition-all'; 
                 
                 const text = document.createElement('span');
                 text.className = 'text-slate-700 font-bold text-sm md:text-base select-none flex-1';
@@ -849,6 +935,14 @@
                 container.appendChild(input);
                 container.appendChild(text);
                 categorySelectorEl.appendChild(container);
+            });
+            syncQuizChoiceStates();
+        }
+
+        function syncQuizChoiceStates() {
+            document.querySelectorAll('.quiz-choice').forEach(label => {
+                const checkbox = label.querySelector('input[type="checkbox"]');
+                label.classList.toggle('is-selected', Boolean(checkbox && checkbox.checked));
             });
         }
         
@@ -1104,12 +1198,17 @@
             } else {
                 studyView.classList.add('hidden-section');
                 quizView.classList.remove('hidden-section');
+                syncQuizChoiceStates();
                 
                 tabQuiz.classList.remove('text-slate-500', 'hover:bg-slate-100');
                 tabQuiz.classList.add('bg-gradient-to-r', 'from-violet-500', 'to-fuchsia-500', 'text-white', 'shadow-md', 'scale-100', 'md:scale-105');
                 
                 tabStudy.classList.remove('bg-gradient-to-r', 'from-violet-500', 'to-fuchsia-500', 'text-white', 'shadow-md', 'scale-100', 'md:scale-105');
                 tabStudy.classList.add('text-slate-500', 'hover:bg-slate-100');
+
+                requestAnimationFrame(() => {
+                    quizView.scrollIntoView({ block: 'start', behavior: 'smooth' });
+                });
             }
         }
 
@@ -1120,6 +1219,8 @@
         backToLobbyBtn.addEventListener('click', returnToLobby);
         nextQuestionBtn.addEventListener('click', generateQuestion);
         submitBtn.addEventListener('click', checkAnswer);
+        categorySelectorEl.addEventListener('change', syncQuizChoiceStates);
+        document.getElementById('form-selector').addEventListener('change', syncQuizChoiceStates);
 
         document.addEventListener('keydown', (event) => {
             if (event.key === 'Enter' && !quizView.classList.contains('hidden-section') && !quizInterface.classList.contains('hidden-section')) {
