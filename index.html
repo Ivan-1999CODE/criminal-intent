@@ -229,6 +229,10 @@
         }
 
         @media (max-width: 767px) {
+            .blob {
+                display: none;
+            }
+
             .glass-panel {
                 border-radius: 1.25rem;
             }
@@ -249,39 +253,70 @@
                 display: none;
             }
 
+            #quiz-lobby > h2 {
+                margin-bottom: 0.5rem;
+            }
+
+            #quiz-lobby > p {
+                display: none;
+            }
+
             .quiz-options-grid {
                 display: flex;
                 flex-direction: column;
-                gap: 0.875rem;
+                gap: 0.75rem;
                 margin-bottom: 1rem;
+                max-width: 100%;
+                width: 100%;
             }
 
             .quiz-option-card {
-                padding: 1rem;
+                min-width: 0;
+                padding: 0.875rem;
+                width: 100%;
+            }
+
+            .quiz-option-card h3 {
+                margin-bottom: 0.75rem;
             }
 
             #category-selector,
             #form-selector {
                 display: grid;
-                grid-template-columns: 1fr;
-                gap: 0.75rem;
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 0.625rem;
             }
 
             .quiz-choice {
+                gap: 0.5rem;
+                min-width: 0;
                 width: 100%;
-                padding: 0.875rem;
+                padding: 0.75rem;
                 border-radius: 0.875rem;
             }
 
             .quiz-choice input[type="checkbox"] {
-                width: 1.5rem;
-                height: 1.5rem;
+                width: 1.375rem;
+                height: 1.375rem;
+            }
+
+            .quiz-choice span {
+                line-height: 1.2;
+                min-width: 0;
+                overflow-wrap: anywhere;
             }
 
             #start-game-btn {
                 position: sticky;
                 bottom: max(0.75rem, env(safe-area-inset-bottom));
                 z-index: 30;
+            }
+        }
+
+        @media (max-width: 359px) {
+            #category-selector,
+            #form-selector {
+                grid-template-columns: 1fr;
             }
         }
     </style>
