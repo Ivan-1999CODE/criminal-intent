@@ -311,6 +311,71 @@
                 bottom: max(0.75rem, env(safe-area-inset-bottom));
                 z-index: 30;
             }
+
+            /* --- 手機：把動詞表格改成滿版卡片，取消橫向捲動與右側留白 --- */
+            .table-scroll {
+                overflow-x: hidden;
+                padding: 0.75rem;
+            }
+
+            .verb-table {
+                display: block;
+                width: 100%;
+                min-width: 0;
+            }
+
+            .verb-table thead {
+                display: none;
+            }
+
+            .verb-table tbody {
+                display: block;
+            }
+
+            .verb-table tr {
+                display: block;
+                background: #ffffff;
+                border: 1px solid #eef2f7;
+                border-radius: 0.875rem;
+                margin-bottom: 0.625rem;
+                padding: 0.25rem 0.25rem;
+                box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+            }
+
+            .verb-table tr:last-child {
+                margin-bottom: 0;
+            }
+
+            .verb-table td {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 0.75rem;
+                text-align: right;
+                border: 0 !important;
+                border-bottom: 1px solid #f1f5f9 !important;
+                padding: 0.55rem 0.85rem;
+            }
+
+            .verb-table tr td:last-child {
+                border-bottom: 0 !important;
+            }
+
+            .verb-table td::before {
+                content: attr(data-label);
+                flex: 0 0 auto;
+                font-size: 0.78rem;
+                font-weight: 700;
+                color: #94a3b8;
+                text-transform: none;
+                letter-spacing: normal;
+                text-align: left;
+            }
+
+            .verb-table td .table-cell-content {
+                justify-content: flex-end;
+                font-size: 1.05rem;
+            }
         }
 
         @media (max-width: 359px) {
@@ -935,12 +1000,20 @@
                          }
                     });
 
-                    row.appendChild(createPlayAllCell(verb));
-                    row.appendChild(createTableCell(verb.infinitive));
-                    row.appendChild(createTableCell(verb.pastSimple));
-                    row.appendChild(createTableCell(verb.pastParticiple));
-                    row.appendChild(createTableCell(verb.presentParticiple));
-                    row.appendChild(createTableCell(verb.translation));
+                    const rowCells = [
+                        createPlayAllCell(verb),
+                        createTableCell(verb.infinitive),
+                        createTableCell(verb.pastSimple),
+                        createTableCell(verb.pastParticiple),
+                        createTableCell(verb.presentParticiple),
+                        createTableCell(verb.translation),
+                    ];
+                    // data-label 提供手機卡片排版時，每格左側的欄位名稱
+                    const cellLabels = ['全部播放', '原形', '過去式', '過去分詞', 'V-ing', '中文'];
+                    rowCells.forEach((cell, i) => {
+                        cell.setAttribute('data-label', cellLabels[i]);
+                        row.appendChild(cell);
+                    });
                     tbody.appendChild(row);
                 });
                 table.appendChild(tbody);
