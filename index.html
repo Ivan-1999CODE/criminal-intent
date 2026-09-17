@@ -206,6 +206,28 @@
             border-radius: 1rem;
         }
 
+        .mode-choice {
+            display: flex; align-items: center; justify-content: center; gap: 0.5rem;
+            padding: 1rem 0.5rem; border: 2px solid #cbd5e1; border-radius: 1rem;
+            background: white; font-weight: 700; cursor: pointer;
+        }
+        .mode-choice:has(:checked) { border-color: #7c3aed; background: #f5f3ff; color: #6d28d9; }
+        .mode-choice input { accent-color: #7c3aed; }
+        #choice-options { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.75rem; }
+        .answer-choice {
+            display: flex; align-items: center; gap: 0.75rem; min-width: 0; min-height: 76px;
+            padding: 1rem; background: white; border: 3px solid #cbd5e1; border-radius: 1rem;
+            font-size: 1.25rem; font-weight: 700; text-align: left; overflow-wrap: anywhere;
+        }
+        .answer-choice:not(:disabled):hover { border-color: #8b5cf6; background: #f5f3ff; }
+        .answer-choice:focus-visible { outline: 3px solid #8b5cf6; outline-offset: 3px; }
+        .answer-choice:disabled { cursor: default; }
+        .answer-choice.is-correct { border-color: #059669; background: #ecfdf5; color: #065f46; }
+        .answer-choice.is-wrong { border-color: #e11d48; background: #fff1f2; color: #9f1239; }
+        .answer-choice.is-muted { opacity: 0.5; }
+        .choice-letter { flex-shrink: 0; font-size: 0.85rem; border-radius: 0.5rem; padding: 0.25rem 0.5rem; background: #f1f5f9; color: #475569; }
+        @media (max-width: 480px) { #choice-options { grid-template-columns: 1fr; } .answer-choice { min-height: 60px; } }
+
         .quiz-choice {
             min-height: 48px;
         }
@@ -401,6 +423,14 @@
                         <h2 class="text-2xl md:text-4xl font-black text-slate-800 mb-3 md:mb-4">準備好接受挑戰了嗎？</h2>
                         <p class="text-base md:text-xl text-slate-600 mb-8 max-w-md">選擇下方的範圍，測試你對動詞三態的熟悉程度！</p>
                         
+                        <fieldset class="w-full max-w-xl mb-6">
+                            <legend class="font-bold text-lg mb-3">選擇練習模式</legend>
+                            <div class="grid grid-cols-2 gap-3">
+                                <label class="mode-choice"><input type="radio" name="quiz-mode" value="spelling" checked> ✍️ 拼字練習</label>
+                                <label class="mode-choice"><input type="radio" name="quiz-mode" value="choice"> 🧩 選擇題</label>
+                            </div>
+                            <p class="text-sm text-slate-500 mt-3">選擇題：每題四選一，點選後立即對答案。</p>
+                        </fieldset>
                         <div class="quiz-options-grid flex flex-col md:flex-row gap-4 mb-8 w-full max-w-4xl justify-center">
                             <!-- 範圍選擇器 -->
                             <div class="quiz-option-card bg-white/60 p-5 rounded-2xl border border-white shadow-inner flex-1">
@@ -425,7 +455,7 @@
                                 <div id="form-selector" class="grid grid-cols-1 gap-3 text-left">
                                     <label class="quiz-choice flex items-center gap-3 p-3 bg-white rounded-xl border-2 border-slate-200 cursor-pointer transition-all hover:border-purple-400 has-[:checked]:border-purple-500 has-[:checked]:bg-purple-50 shadow-sm active:scale-95">
                                         <input type="checkbox" value="infinitive" checked class="quiz-checkbox w-5 h-5 md:w-6 md:h-6 text-purple-600 rounded focus:ring-purple-500 border-gray-300 transition-all">
-                                        <span class="text-slate-700 font-bold text-sm md:text-base select-none flex-1">現在式</span>
+                                        <span class="text-slate-700 font-bold text-sm md:text-base select-none flex-1">原形</span>
                                     </label>
                                     <label class="quiz-choice flex items-center gap-3 p-3 bg-white rounded-xl border-2 border-slate-200 cursor-pointer transition-all hover:border-purple-400 has-[:checked]:border-purple-500 has-[:checked]:bg-purple-50 shadow-sm active:scale-95">
                                         <input type="checkbox" value="pastSimple" checked class="quiz-checkbox w-5 h-5 md:w-6 md:h-6 text-purple-600 rounded focus:ring-purple-500 border-gray-300 transition-all">
@@ -433,7 +463,7 @@
                                     </label>
                                     <label class="quiz-choice flex items-center gap-3 p-3 bg-white rounded-xl border-2 border-slate-200 cursor-pointer transition-all hover:border-purple-400 has-[:checked]:border-purple-500 has-[:checked]:bg-purple-50 shadow-sm active:scale-95">
                                         <input type="checkbox" value="pastParticiple" checked class="quiz-checkbox w-5 h-5 md:w-6 md:h-6 text-purple-600 rounded focus:ring-purple-500 border-gray-300 transition-all">
-                                        <span class="text-slate-700 font-bold text-sm md:text-base select-none flex-1">VPP</span>
+                                        <span class="text-slate-700 font-bold text-sm md:text-base select-none flex-1">過去分詞（VPP）</span>
                                     </label>
                                     <label class="quiz-choice flex items-center gap-3 p-3 bg-white rounded-xl border-2 border-slate-200 cursor-pointer transition-all hover:border-purple-400 has-[:checked]:border-purple-500 has-[:checked]:bg-purple-50 shadow-sm active:scale-95">
                                         <input type="checkbox" value="presentParticiple" checked class="quiz-checkbox w-5 h-5 md:w-6 md:h-6 text-purple-600 rounded focus:ring-purple-500 border-gray-300 transition-all">
@@ -480,6 +510,7 @@
                             </div>
 
                             <div class="w-full space-y-4">
+                                <div id="choice-options" class="hidden-section" role="group" aria-label="四選一答案"></div>
                                 <input type="text" id="answer-input" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="請輸入答案..." class="w-full text-center text-xl md:text-3xl font-bold py-4 px-4 md:py-5 md:px-6 rounded-2xl border-4 border-slate-200 focus:border-purple-400 focus:ring-4 focus:ring-purple-100 outline-none transition-all placeholder:text-slate-300 bg-white shadow-inner text-slate-700">
                                 
                                 <!-- 按鈕區域 -->
@@ -504,7 +535,7 @@
                             </div>
 
                             <!-- 更新：移除原本寫死的高度限制，讓大卡片能自動撐開 -->
-                            <div id="feedback-container" class="mt-6 w-full transition-all opacity-0">
+                            <div id="feedback-container" class="mt-6 w-full transition-all opacity-0" role="status" aria-live="polite">
                                 <!-- Feedback -->
                             </div>
 
@@ -689,6 +720,7 @@
             }
         ];
 
+        let quizMode = 'spelling';
         let currentQuestion = null;
         let score = 0;
         let streak = 0;
@@ -700,6 +732,7 @@
         const verbTablesContainer = document.getElementById('verb-tables');
         const questionText = document.getElementById('question-text');
         const answerInput = document.getElementById('answer-input');
+        const choiceOptions = document.getElementById('choice-options');
         const submitBtn = document.getElementById('submit-btn');
         const nextActionContainer = document.getElementById('next-action-container');
         const nextQuestionBtn = document.getElementById('next-question-btn');
@@ -1088,6 +1121,104 @@
             renderAnswerHistory();
         }
 
+        // 人工整理的錯誤變化；同一個動詞的所有合法形式都不可當干擾項。
+        const distractorBank = {
+            ask: 'askked askken askeded', learn: 'learnned learnen learneded',
+            start: 'startted starten starteded', play: 'plaied playyed playded',
+            die: 'dieed dyied dieded', close: 'closeed closen clossed',
+            like: 'likeed likken likked', hope: 'hopeed hopen hopeen',
+            cost: 'costted costen costeded', cut: 'cutted cutteded cutten',
+            hit: 'hitted hitten hited', let: 'letted letten leted',
+            put: 'putteded putten puted', read: 'readed readen readded',
+            set: 'setted setten seted', spread: 'spreaded spreaden spreadded',
+            fit: 'fited fitten fitteded', hurt: 'hurted hurten hurtted',
+            quit: 'quited quitten quitteded', shut: 'shuted shutten shutted',
+            buy: 'buyed boughted buyied', sell: 'selled solded sellen',
+            hold: 'holded helded holden', tell: 'telled tolded tellen',
+            think: 'thinked thoughted thinken', bring: 'bringed broughted bringen',
+            meet: 'meeted metted meeten', keep: 'keeped kepted keepen',
+            sleep: 'sleeped slepted sleepen', find: 'finded foundeded finden',
+            seek: 'seeked soughted seeken', teach: 'teached taughted teachen',
+            spend: 'spended spented spenden', send: 'sended sented senden',
+            stand: 'standed stooded standen', feel: 'feeled felted feelen',
+            catch: 'catched caughted catchen', hear: 'heared hearded hearen',
+            build: 'builded builted builden', bend: 'bendeded bented benden',
+            burn: 'burnned burnted burnen', deal: 'dealed dealted dealen',
+            dig: 'digged dugged digen', dive: 'divved doven doveed',
+            feed: 'feeded feded feeden', fight: 'fighted foughted fighten',
+            get: 'getted gotted gottened', hang: 'hangged hunged hangen',
+            have: 'haved haded havven', lead: 'leadeded leded leaden',
+            leave: 'leaveded lefted leaven', lend: 'lended lented lenden',
+            light: 'lightted litted lighten', lose: 'losed losted losen',
+            make: 'maked maded makken', mean: 'meaned meanted meanen',
+            pay: 'payyed paided payen', say: 'sayed saided sayen',
+            shine: 'shinneded shoned shinen', shoot: 'shooted shotted shooten',
+            sit: 'sitted satted sitten', smell: 'smellled smelted smellen',
+            spell: 'spellled spelted spellen', stick: 'sticked stucked sticken',
+            sweep: 'sweeped swepted sweepen', understand: 'understanded understooded understanden',
+            win: 'winned wonned winen', ride: 'rided roded riden',
+            drive: 'drived droved drivven', shake: 'shaked shooked shakken',
+            choose: 'choosed chosed choosen', break: 'breaked broked brokken',
+            speak: 'speaked spoked spokken', write: 'writed wroted writted',
+            eat: 'eated eatten ated', fall: 'falled felleded fallened',
+            forget: 'forgetted forgoted forgetten', begin: 'begined beganned beginned',
+            drink: 'drinked dranked drunkt', know: 'knowed knewed knowen',
+            fly: 'flyed flewed flowen', go: 'goed wented goded',
+            see: 'seeed sawwed seened', grow: 'growed grewn growen',
+            swim: 'swimmed swammed swimmen', do: 'doed dided doned',
+            be: 'beed wased weren', bear: 'beared boreed borned',
+            beat: 'beated beatten beatened', bite: 'bited bitted biten',
+            blow: 'bloweded blewed blowen', draw: 'drawed drewed drawen',
+            forgive: 'forgived forgaved forgivven', freeze: 'freezed frozed frozzen',
+            give: 'gived gaved givven', hide: 'hided hidded hiden',
+            lie: 'lieed layed lainned', ring: 'ringged ranned runged',
+            rise: 'rised rosed rissen', show: 'showwed showen showned',
+            sing: 'singged sangged sunged', steal: 'stealed stoled stollen',
+            take: 'taked tooken takken', throw: 'throwed threwed throwen',
+            wake: 'wakken woked wokened', wear: 'weared wored wearen',
+            run: 'runned raned runneded', come: 'comed camed commen',
+            become: 'becomed becamed becommen', overcome: 'overcomed overcamed overcommen'
+        };
+        // 題庫外也可能存在正確的英美拼法或不同語意用法，避免拿來誤導學生。
+        const acceptedVariants = 'learnt costed fitted quitted burned dived gotten hanged lighted shined smelled spelled showed borne waked dreamed payed ringed lied lay lain founded leaded leaved bent bended'.split(' ');
+
+        function shuffleOptions(items) {
+            const result = [...items];
+            for (let i = result.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [result[i], result[j]] = [result[j], result[i]];
+            }
+            return result;
+        }
+
+        function makeChoiceOptions(verb, type) {
+            const root = verb.infinitive;
+            const forbidden = new Set(acceptedVariants);
+            verbData.flatMap(group => group.verbs).forEach(item => {
+                Object.keys(formLabels).forEach(key => item[key].split('/').forEach(word => forbidden.add(word)));
+            });
+            const stem = root.endsWith('e') ? root.slice(0, -1) : root;
+            const candidates = type === 'presentParticiple'
+                ? [root + 'ing', stem + 'ing', stem + stem.slice(-1) + 'ing', root + 'eing', stem + 'inng', root + 'ying']
+                : (distractorBank[root] || '').split(' ');
+            const wrong = [...new Set(candidates)].filter(word => word && !forbidden.has(word));
+            if (wrong.length < 3) throw new Error(`干擾項不足：${root} / ${type}`);
+            return shuffleOptions([verb[type], ...shuffleOptions(wrong).slice(0, 3)]);
+        }
+
+        function renderChoiceOptions() {
+            choiceOptions.replaceChildren();
+            makeChoiceOptions(currentQuestion.verb, currentQuestion.type).forEach((answer, index) => {
+                const button = document.createElement('button');
+                button.type = 'button';
+                button.className = 'answer-choice';
+                button.dataset.answer = answer;
+                button.innerHTML = `<span class="choice-letter">${'ABCD'[index]}</span><span>${escapeHTML(answer)}</span>`;
+                button.addEventListener('click', () => checkAnswer(answer));
+                choiceOptions.appendChild(button);
+            });
+        }
+
         function startGame() {
             const selectedCategories = Array.from(document.querySelectorAll('#category-selector input:checked'));
             const selectedForms = Array.from(document.querySelectorAll('#form-selector input:checked'));
@@ -1099,6 +1230,8 @@
                 alert("請至少選擇一種題型喔！😅");
                 return;
             }
+            quizMode = document.querySelector('input[name="quiz-mode"]:checked').value;
+            speechSynthesis.cancel();
             quizLobby.classList.add('hidden-section');
             quizInterface.classList.remove('hidden-section');
             score = 0;
@@ -1111,6 +1244,7 @@
         }
 
         function returnToLobby() {
+            speechSynthesis.cancel();
             quizInterface.classList.add('hidden-section');
             quizLobby.classList.remove('hidden-section');
         }
@@ -1132,13 +1266,13 @@
             let typeColorClass = '';
             
             if (questionType === 'infinitive') {
-                typeText = '現在式';
+                typeText = '原形';
                 typeColorClass = 'text-blue-300';
             } else if (questionType === 'pastSimple') {
                 typeText = '過去式';
                 typeColorClass = 'text-yellow-300';
             } else if (questionType === 'pastParticiple') {
-                typeText = 'VPP';
+                typeText = '過去分詞（VPP）';
                 typeColorClass = 'text-green-300';
             } else {
                 typeText = 'V-ing';
@@ -1162,20 +1296,24 @@
                 <div class="text-xs md:text-sm uppercase tracking-widest opacity-70 mb-2">Quiz Time</div>
                 <span class="text-4xl md:text-6xl font-black block mb-4 filter drop-shadow-lg">${promptWord}</span>
                 <div class="text-lg md:text-xl font-medium opacity-90">
-                    請輸入 <span class="${typeColorClass} font-bold underline decoration-wavy underline-offset-4">${typeText}</span>
+                    ${quizMode === 'choice' ? '請選出' : '請輸入'} <span class="${typeColorClass} font-bold underline decoration-wavy underline-offset-4">${typeText}</span>
                 </div>
             `;
             
-            speak(currentQuestion.answer.replace('/', ' or '));
+            if (quizMode === 'spelling') speak(currentQuestion.answer.replace('/', ' or '));
             
             // 重置輸入框樣式
             answerInput.className = "w-full text-center text-xl md:text-3xl font-bold py-4 px-4 md:py-5 md:px-6 rounded-2xl border-4 border-slate-200 focus:border-purple-400 focus:ring-4 focus:ring-purple-100 outline-none transition-all placeholder:text-slate-300 bg-white shadow-inner text-slate-700";
             answerInput.value = '';
             answerInput.disabled = false;
-            answerInput.focus();
+            answerInput.classList.toggle('hidden-section', quizMode === 'choice');
+            choiceOptions.classList.toggle('hidden-section', quizMode !== 'choice');
+            if (quizMode === 'choice') renderChoiceOptions();
+            else answerInput.focus();
             answerInput.parentElement.classList.remove('opacity-50'); 
             
-            submitBtn.classList.remove('hidden-section');
+            submitBtn.classList.toggle('hidden-section', quizMode === 'choice');
+            submitBtn.parentElement.classList.toggle('hidden-section', quizMode === 'choice');
             nextActionContainer.classList.add('hidden-section');
             
             // 重置回饋區塊
@@ -1185,11 +1323,12 @@
             isQuestionAnswered = false;
         }
 
-        function checkAnswer() {
+        function checkAnswer(selectedAnswer) {
             if (!currentQuestion) return;
             if (isQuestionAnswered) return;
 
-            const userAnswer = answerInput.value.trim().toLowerCase();
+            if (quizMode === 'choice' && typeof selectedAnswer !== 'string') return;
+            const userAnswer = (quizMode === 'choice' ? selectedAnswer : answerInput.value).trim().toLowerCase();
             const correctAnswer = currentQuestion.answer.toLowerCase();
 
             feedbackContainer.classList.remove('opacity-0');
@@ -1239,13 +1378,29 @@
                 speak(answerSpeech);  // 只唸出單字
             }
             
+            if (quizMode === 'choice') {
+                choiceOptions.querySelectorAll('button').forEach(button => {
+                    button.disabled = true;
+                    const correct = button.dataset.answer.toLowerCase() === correctAnswer;
+                    const chosen = button.dataset.answer.toLowerCase() === userAnswer;
+                    button.classList.add(correct ? 'is-correct' : chosen ? 'is-wrong' : 'is-muted');
+                    if (correct || chosen) {
+                        const marker = document.createElement('span');
+                        marker.textContent = correct ? ' ✓ 正解' : ' ✗';
+                        marker.className = 'text-sm';
+                        button.appendChild(marker);
+                    }
+                });
+                const verb = currentQuestion.verb;
+                feedbackContainer.innerHTML += `<div class="mt-3 rounded-xl bg-slate-100 p-4 text-center font-bold">原形 → 過去式 → 過去分詞<br><span class="text-lg">${escapeHTML(verb.infinitive)} → ${escapeHTML(verb.pastSimple)} → ${escapeHTML(verb.pastParticiple)}</span><div class="mt-2 text-sm">V-ing：${escapeHTML(verb.presentParticiple)}</div></div>`;
+            }
             updateScoreboard();
-            
+            submitBtn.parentElement.classList.remove('hidden-section');
             answerInput.disabled = true;
             
             submitBtn.classList.add('hidden-section');
             nextActionContainer.classList.remove('hidden-section');
-            setTimeout(() => nextQuestionBtn.focus(), 50);
+            nextQuestionBtn.focus();
             
             isQuestionAnswered = true;
         }
@@ -1289,6 +1444,8 @@
 
         document.addEventListener('keydown', (event) => {
             if (event.key === 'Enter' && !quizView.classList.contains('hidden-section') && !quizInterface.classList.contains('hidden-section')) {
+                if (event.target.tagName === 'BUTTON' || event.repeat) return;
+                event.preventDefault();
                 if (isQuestionAnswered) {
                     generateQuestion();
                 } else {
