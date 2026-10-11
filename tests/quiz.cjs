@@ -91,7 +91,45 @@ const path = require('node:path');
         await page.locator('#answer-input').press('Enter');
         assert.equal(await page.locator('#score').textContent(), '10');
         assert.equal(await page.locator('#correct-count').textContent(), '1');
+        // Every mode/form must show the requested form prominently and update between questions.
+        for (const width of [375, 1280]) {
+            await page.setViewportSize({ width, height: 900 });
+            for (const mode of ['choice', 'spelling']) {
+                for (const [type, code, label] of [
+                    ['infinitive', 'V', '原形'],
+                    ['pastSimple', 'V-ed', '過去式'],
+                    ['pastParticiple', 'Vpp', '過去分詞'],
+                    ['presentParticiple', 'V-ing', '現在分詞']
+                ]) {
+                    await page.evaluate(({ mode, type }) => {
+                        quizMode = mode;
+                        document.querySelectorAll('#form-selector input').forEach(input => {
+                            input.checked = input.value === type;
+                        });
+                        generateQuestion();
+                    }, { mode, type });
+                    assert.equal(await page.locator('.question-target-code').textContent(), code);
+                    assert.equal(await page.locator('.question-target-name').textContent(), label);
+                    assert.equal(await page.locator('.question-target-action').textContent(), mode === 'choice' ? '本題請選出' : '本題請輸入');
+                    assert.equal(await page.locator('#question-target').getAttribute('data-form'), type);
+                    const layout = await page.locator('#question-target').evaluate(el => {
+                        const code = el.querySelector('.question-target-code');
+                        const word = document.querySelector('.question-word');
+                        return {
+                            fontSize: parseFloat(getComputedStyle(code).fontSize),
+                            aboveWord: el.getBoundingClientRect().bottom <= word.getBoundingClientRect().top,
+                            fits: el.scrollWidth <= el.clientWidth && code.getBoundingClientRect().right <= el.getBoundingClientRect().right
+                        };
+                    });
+                    assert.ok(layout.fontSize >= 40 && layout.aboveWord && layout.fits, JSON.stringify({ mode, type, width, layout }));
+                    if (mode === 'spelling') {
+                        assert.equal(await page.locator('#answer-input').getAttribute('placeholder'), `請輸入${label}（${code}）`);
+                        assert.equal(await page.locator('#answer-input').getAttribute('aria-describedby'), 'question-target');
+                    }
+                }
+            }
+        }
         assert.deepEqual(errors, []);
-        console.log(`PASS: ${coverage} option sets; mixed/past-only filters; correct/wrong answers; repeat guard; keyboard; mobile layout; spelling regression.`);
+        console.log(`PASS: ${coverage} option sets; mixed/past-only filters; correct/wrong answers; repeat guard; keyboard; mobile layout; spelling regression; prominent targets for all 4 forms in both modes at mobile/desktop widths.`);
     } finally { await browser.close(); }
 })().catch(error => { console.error(error); process.exitCode = 1; });
