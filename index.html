@@ -213,6 +213,39 @@
         }
         .mode-choice:has(:checked) { border-color: #7c3aed; background: #f5f3ff; color: #6d28d9; }
         .mode-choice input { accent-color: #7c3aed; }
+        .quiz-hud {
+            display: grid; grid-template-columns: auto minmax(0, 1fr) auto;
+            align-items: center; gap: 1rem;
+        }
+        .accuracy-card {
+            width: 100%; max-width: 28rem; min-width: 0; justify-self: end;
+            padding: 0.75rem 1rem; border: 1px solid #e2e8f0; border-radius: 1rem;
+            background: white; box-shadow: 0 2px 4px rgba(15, 23, 42, 0.04);
+        }
+        .accuracy-heading, .accuracy-labels {
+            display: flex; justify-content: space-between; align-items: center;
+            flex-wrap: wrap; gap: 0.25rem 0.5rem; font-size: 0.75rem; font-weight: 700;
+        }
+        .accuracy-heading { margin-bottom: 0.5rem; color: #475569; }
+        #accuracy-status { color: #64748b; font-weight: 500; }
+        .accuracy-track {
+            display: flex; height: 1.125rem; overflow: hidden; border-radius: 999px;
+            background: #f1f5f9;
+        }
+        .accuracy-segment { height: 100%; transition: width 550ms ease-in-out; }
+        #accuracy-correct-fill { background: #10b981; }
+        #accuracy-wrong-fill { background: #f43f5e; }
+        .accuracy-labels { margin-top: 0.375rem; font-variant-numeric: tabular-nums; }
+        .accuracy-correct-label { color: #047857; }
+        .accuracy-wrong-label { color: #be123c; }
+        @media (max-width: 639px) {
+            .quiz-hud { grid-template-columns: 1fr auto; gap: 0.75rem; }
+            .quiz-hud > #back-to-lobby-btn { justify-self: start; }
+            .accuracy-card { grid-column: 1 / -1; grid-row: 2; max-width: none; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .accuracy-segment { transition: none; }
+        }
         .question-target {
             display: flex; flex-direction: column; align-items: center; gap: 0.25rem;
             padding: 1rem; margin-bottom: 1.5rem; border: 3px solid white;
@@ -495,10 +528,24 @@
                     <div id="quiz-interface" class="hidden-section flex-1 flex flex-col p-4 md:p-10">
                         
                         <!-- HUD -->
-                        <div class="flex justify-between items-center mb-6 md:mb-8">
+                        <div class="quiz-hud mb-6 md:mb-8">
                             <button id="back-to-lobby-btn" class="px-3 py-2 bg-slate-100 rounded-lg text-sm font-bold text-slate-500 hover:text-slate-700 hover:bg-slate-200 flex items-center gap-1 transition-colors">
                                 ← 設定
                             </button>
+                            <div class="accuracy-card">
+                                <div class="accuracy-heading">
+                                    <span id="accuracy-title">紅綠攻防</span>
+                                    <span id="accuracy-status">各半起跑 · 尚未作答</span>
+                                </div>
+                                <div id="accuracy-meter" class="accuracy-track" role="meter" aria-labelledby="accuracy-title" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50" aria-valuetext="尚未作答，紅綠各占 50%">
+                                    <div id="accuracy-correct-fill" class="accuracy-segment" style="width: 50%" aria-hidden="true"></div>
+                                    <div id="accuracy-wrong-fill" class="accuracy-segment" style="width: 50%" aria-hidden="true"></div>
+                                </div>
+                                <div class="accuracy-labels">
+                                    <span class="accuracy-correct-label">✓ 答對 <span id="accuracy-correct-percent">50%</span></span>
+                                    <span class="accuracy-wrong-label">✗ 答錯 <span id="accuracy-wrong-percent">50%</span></span>
+                                </div>
+                            </div>
                             <div class="flex gap-2 md:gap-4">
                                 <div class="bg-white px-3 py-1.5 md:px-4 md:py-2 rounded-xl shadow-sm border border-slate-100 flex flex-col items-center min-w-[70px] md:min-w-[100px]">
                                     <span class="text-[10px] md:text-xs font-bold text-slate-400 uppercase tracking-wider">Score</span>
@@ -754,6 +801,12 @@
         const feedbackContainer = document.getElementById('feedback-container');
         const scoreEl = document.getElementById('score');
         const streakEl = document.getElementById('streak');
+        const accuracyMeter = document.getElementById('accuracy-meter');
+        const accuracyCorrectFill = document.getElementById('accuracy-correct-fill');
+        const accuracyWrongFill = document.getElementById('accuracy-wrong-fill');
+        const accuracyCorrectPercent = document.getElementById('accuracy-correct-percent');
+        const accuracyWrongPercent = document.getElementById('accuracy-wrong-percent');
+        const accuracyStatus = document.getElementById('accuracy-status');
         const categorySelectorEl = document.getElementById('category-selector');
         const correctListEl = document.getElementById('correct-list');
         const wrongListEl = document.getElementById('wrong-list');
@@ -1061,8 +1114,26 @@
             scoreEl.textContent = score;
             streakEl.textContent = streak;
             localStreakEl.innerHTML = `🔥 x${streak}`;
+            updateAccuracyMeter();
             scoreEl.parentElement.classList.add('scale-110');
             setTimeout(() => scoreEl.parentElement.classList.remove('scale-110'), 150);
+        }
+
+        function updateAccuracyMeter() {
+            const total = correctAnswers.length + wrongAnswers.length;
+            // 50/50 is only the starting display; answered questions use the actual ratio.
+            const correctPercent = total === 0 ? 50 : correctAnswers.length / total * 100;
+            const displayedCorrect = Math.round(correctPercent);
+            const displayedWrong = 100 - displayedCorrect;
+            accuracyCorrectFill.style.width = `${correctPercent}%`;
+            accuracyWrongFill.style.width = `${100 - correctPercent}%`;
+            accuracyCorrectPercent.textContent = `${displayedCorrect}%`;
+            accuracyWrongPercent.textContent = `${displayedWrong}%`;
+            accuracyStatus.textContent = total === 0 ? '各半起跑 · 尚未作答' : `已答 ${total} 題`;
+            accuracyMeter.setAttribute('aria-valuenow', correctPercent);
+            accuracyMeter.setAttribute('aria-valuetext', total === 0
+                ? '尚未作答，紅綠各占 50%'
+                : `已答 ${total} 題，答對 ${correctAnswers.length} 題（${displayedCorrect}%），答錯 ${wrongAnswers.length} 題（${displayedWrong}%）`);
         }
 
         const formLabels = {

@@ -91,6 +91,88 @@ const path = require('node:path');
         await page.locator('#answer-input').press('Enter');
         assert.equal(await page.locator('#score').textContent(), '10');
         assert.equal(await page.locator('#correct-count').textContent(), '1');
+        // The meter uses this round's accepted answers in both modes, not score or streak.
+        await page.emulateMedia({ reducedMotion: 'reduce' });
+        async function assertAccuracy(green, total) {
+            assert.equal(await page.locator('#accuracy-correct-percent').textContent(), `${green}%`);
+            assert.equal(await page.locator('#accuracy-wrong-percent').textContent(), `${100 - green}%`);
+            assert.equal(await page.locator('#accuracy-status').textContent(), total === 0 ? '各半起跑 · 尚未作答' : `已答 ${total} 題`);
+            const meter = await page.locator('#accuracy-meter').evaluate(el => {
+                const segments = [...el.children].map(segment => segment.getBoundingClientRect().width);
+                return { value: Number(el.getAttribute('aria-valuenow')), segments, width: el.getBoundingClientRect().width };
+            });
+            assert.equal(Math.round(meter.value), green);
+            assert.ok(Math.abs(meter.segments[0] / meter.width * 100 - meter.value) < 0.1);
+            assert.ok(Math.abs(meter.segments[0] + meter.segments[1] - meter.width) < 1);
+        }
+        async function answerCurrent(mode, correct) {
+            if (mode === 'choice') {
+                const index = await page.evaluate(correct => [...choiceOptions.children].findIndex(button =>
+                    (button.dataset.answer === currentQuestion.answer) === correct), correct);
+                await page.locator('#choice-options button').nth(index).click();
+            } else {
+                await page.locator('#answer-input').fill(correct ? await page.evaluate(() => currentQuestion.answer) : 'incorrect');
+                await page.locator('#submit-btn').click();
+            }
+        }
+        for (const mode of ['choice', 'spelling']) {
+            await page.click('#back-to-lobby-btn');
+            await page.check(`input[name="quiz-mode"][value="${mode}"]`);
+            await page.click('#start-game-btn');
+            await assertAccuracy(50, 0);
+            assert.match(await page.locator('#accuracy-meter').getAttribute('aria-valuetext'), /尚未作答/);
+            if (mode === 'spelling') {
+                await page.locator('#answer-input').fill('   ');
+                await page.click('#submit-btn');
+                await assertAccuracy(50, 0);
+            }
+            await answerCurrent(mode, false);
+            await assertAccuracy(0, 1);
+            await page.click('#next-question-btn');
+            await assertAccuracy(0, 1); // A new question does not count as an answer.
+            await answerCurrent(mode, true);
+            await assertAccuracy(50, 2);
+            await page.evaluate(() => checkAnswer(currentQuestion.answer));
+            await assertAccuracy(50, 2); // Repeated submission must not move the meter.
+            await page.click('#next-question-btn');
+            await answerCurrent(mode, true);
+            await assertAccuracy(67, 3);
+            for (let i = 0; i < 7; i++) {
+                await page.click('#next-question-btn');
+                await answerCurrent(mode, true);
+            }
+            await assertAccuracy(90, 10);
+            assert.equal(await page.locator('#correct-count').textContent(), '9');
+            assert.equal(await page.locator('#wrong-count').textContent(), '1');
+            await page.click('#tab-study');
+            await page.click('#tab-quiz');
+            await assertAccuracy(90, 10);
+            for (const width of [320, 375, 768, 1280]) {
+                await page.setViewportSize({ width, height: 900 });
+                const layout = await page.locator('.quiz-hud').evaluate(el => {
+                    const card = el.querySelector('.accuracy-card');
+                    const meter = card.getBoundingClientRect();
+                    const stats = el.lastElementChild.getBoundingClientRect();
+                    return {
+                        fits: card.scrollWidth <= card.clientWidth && el.scrollWidth <= el.clientWidth,
+                        stacked: meter.top >= stats.bottom,
+                        beside: meter.right <= stats.left && meter.top < stats.bottom
+                    };
+                });
+                assert.ok(layout.fits && (width < 640 ? layout.stacked : layout.beside), JSON.stringify({ mode, width, layout }));
+                await assertAccuracy(90, 10);
+            }
+            for (let i = 0; i < 10; i++) {
+                await page.click('#next-question-btn');
+                await answerCurrent(mode, false);
+            }
+            await assertAccuracy(45, 20); // More mistakes let red overtake green.
+            await page.click('#back-to-lobby-btn');
+            await page.click('#start-game-btn');
+            await assertAccuracy(50, 0);
+            await answerCurrent(mode, true);
+            await assertAccuracy(100, 1);
+        }
         // Every mode/form must show the requested form prominently and update between questions.
         for (const width of [375, 1280]) {
             await page.setViewportSize({ width, height: 900 });
@@ -130,6 +212,6 @@ const path = require('node:path');
             }
         }
         assert.deepEqual(errors, []);
-        console.log(`PASS: ${coverage} option sets; mixed/past-only filters; correct/wrong answers; repeat guard; keyboard; mobile layout; spelling regression; prominent targets for all 4 forms in both modes at mobile/desktop widths.`);
+        console.log(`PASS: ${coverage} option sets; mixed/past-only filters; correct/wrong answers; repeat guard; keyboard; mobile layout; spelling regression; prominent targets for all 4 forms; accuracy meter in both modes (initial/reset, blank/repeat guards, 0/100%, 67/33%, 90/10%, red takeover, tab persistence, layouts at 320/375/768/1280px).`);
     } finally { await browser.close(); }
 })().catch(error => { console.error(error); process.exitCode = 1; });
